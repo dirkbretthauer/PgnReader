@@ -42,7 +42,7 @@ namespace PgnReaderTest
         [TestCleanup]
         public void TestCleanup()
         {
-            _pgnReader = null;
+            _pgnReader.Dispose();
         }
 
         [TestMethod]
