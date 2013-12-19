@@ -117,5 +117,17 @@ namespace PgnReaderTest
             Assert.IsNotNull(tag);
             Assert.AreEqual("0-1", tag.Value);
         }
+
+        [TestMethod]
+        public void MovesSectionTest()
+        {
+            _pgnReader.ReadGame();
+
+            Assert.AreEqual(46 * 2, _pgnReader.CurrentGame.Moves.Moves.Count);
+
+            Assert.AreEqual("e4", _pgnReader.CurrentGame.Moves.Moves[0].Move);
+            Assert.AreEqual("Bf4", _pgnReader.CurrentGame.Moves.Moves[34].Move);
+            Assert.AreEqual("fxe3", _pgnReader.CurrentGame.Moves.Moves[91].Move);
+        }
     }
 }

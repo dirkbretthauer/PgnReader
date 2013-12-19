@@ -67,9 +67,13 @@ namespace CChessCore.Pgn
                 }
                 else if(c == ' ' && _singleMoveBuffer.Count > 0)
                 {
-                    _pgnMoves.AddMove(new PgnMove(new string(_singleMoveBuffer.ToArray()).Trim()));
-                    _stateBuffer.Add(c);
-                    _singleMoveBuffer.Clear();
+                    var move = new string(_singleMoveBuffer.ToArray()).Trim();
+                    if(!string.IsNullOrWhiteSpace(move))
+                    {
+                        _pgnMoves.AddMove(new PgnMove(move));
+                        _stateBuffer.Add(c);
+                        _singleMoveBuffer.Clear();
+                    }
                 }
                 else if(c == PgnToken.Period.Token)
                 {
