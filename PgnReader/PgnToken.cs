@@ -29,12 +29,12 @@ namespace CChessCore.Pgn
     {
         public static PgnToken Period = new PgnToken('.');
         public static PgnToken Asterisk = new PgnToken('*');
-        public static PgnToken LeftBracket = new PgnToken('[');
-        public static PgnToken RightBracket = new PgnToken(']');
-        public static PgnToken LeftParenthesis = new PgnToken('{');
-        public static PgnToken RightParenthesis = new PgnToken('}');
-        public static PgnToken LeftAngleBracket = new PgnToken('<');
-        public static PgnToken RightAngleBracket = new PgnToken(']');
+        public static PgnToken TagBegin = new PgnToken('[');
+        public static PgnToken TagEnd = new PgnToken(']');
+        public static PgnToken TextCommentBegin = new PgnToken('{');
+        public static PgnToken TextCommentEnd = new PgnToken('}');
+        public static PgnToken AnnotationVariationBegin = new PgnToken('(');
+        public static PgnToken AnnotationVariationEnd = new PgnToken(')');
         public static PgnToken NumericAnnotationGlyph = new PgnToken('$');
         public static PgnToken RestOfLineComment = new PgnToken(';');
         public static PgnToken EscapeLine = new PgnToken('%');

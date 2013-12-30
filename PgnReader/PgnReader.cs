@@ -38,8 +38,9 @@ namespace CChessCore.Pgn
         private char[] _readerBuffer;
         private int _readerBufferPosition;
         private int _charsRead;
+        private char _nextChar = '\0';
+        private Char? _currentChar;
         private readonly IList<PgnGame> _games;
-        private int _currentCharacter;
 
         private PgnParserState _currentState;
         private static PgnParserState _initState;
@@ -120,19 +121,17 @@ namespace CChessCore.Pgn
             var currentGame = new PgnGame();
             string field = null;
             var fieldStartPosition = _readerBufferPosition;
-
-            var c = '\0';
-            _currentCharacter = 0;
+            var currentCharPos = 0;
             
             while (true)
             {
-                _currentCharacter++;
+                currentCharPos++;
 
                 if (_readerBufferPosition == _charsRead)
                 {
                     if(!TryReadNextBlock(fieldStartPosition, ref field))
                     {
-                        if (_currentState.Parse('\0', currentGame) == PgnParseResult.EndOfGame)
+                        if (_currentState.Parse('\0', '\0', currentGame) == PgnParseResult.EndOfGame)
                         {
                             _games.Add(currentGame);
                             return currentGame;
@@ -142,14 +141,23 @@ namespace CChessCore.Pgn
                     fieldStartPosition = 0;
                 }
 
-                c = _readerBuffer[_readerBufferPosition];
+                if(_currentChar == null)
+                {
+                    _currentChar = _readerBuffer[_readerBufferPosition];
+                    _readerBufferPosition++;
+                }
+
+                _nextChar = _readerBuffer[_readerBufferPosition];
                 _readerBufferPosition++;
 
-                if(_currentState.Parse(c, currentGame) == PgnParseResult.EndOfGame)
+                if(_currentState.Parse(_currentChar.Value, _nextChar, currentGame) == PgnParseResult.EndOfGame)
                 {
                     _games.Add(currentGame);
+                    _currentChar = _nextChar;
                     return currentGame;
                 }
+
+                _currentChar = _nextChar;
             }
 
             return null;

@@ -49,11 +49,11 @@ namespace CChessCore.Pgn
             field.Trim();
             int start = 0;
             int end = 0;
-            if (field.StartsWith(PgnToken.LeftBracket.ToString()))
+            if (field.StartsWith(PgnToken.TagBegin.ToString()))
             {
                 start = 1;
             }
-            if (field.EndsWith(PgnToken.RightBracket.ToString()))
+            if (field.EndsWith(PgnToken.TagEnd.ToString()))
             {
                 end = 1;
             }

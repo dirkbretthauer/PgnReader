@@ -42,9 +42,9 @@ namespace CChessCore.Pgn
                 _isEndOfLine = false;
             }
 
-            public override PgnParseResult Parse(char c, PgnGame currentGame)
+            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
             {
-                if(c == '\n')
+                if(current == '\n')
                 {
                     if(!_isEndOfLine)
                     {
@@ -64,19 +64,19 @@ namespace CChessCore.Pgn
                     _isEndOfLine = false;
                 }
 
-                if(c == PgnToken.RestOfLineComment.Token)
+                if(current == PgnToken.RestOfLineComment.Token)
                 {
                     ChangeState(this, _restOfLineCommentState);
                 }
-                else if(c == PgnToken.LeftParenthesis.Token)
+                else if(current == PgnToken.TextCommentBegin.Token)
                 {
                     ChangeState(this, _parenthesisCommentState);
                 }
-                else if(c == PgnToken.LeftBracket.Token)
+                else if(current == PgnToken.TagBegin.Token)
                 {
                     ChangeState(this, _tagSectionState);
                 }
-                else if(c == PgnToken.Period.Token)
+                else if(current == PgnToken.Period.Token)
                 {
                     ChangeState(this, _movesSectionState);
                 }

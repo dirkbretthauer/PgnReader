@@ -50,26 +50,26 @@ namespace CChessCore.Pgn
                 }
             }
 
-            public override PgnParseResult Parse(char c, PgnGame currentGame)
+            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
             {
-                if (c == PgnToken.RestOfLineComment.Token)
+                if (current == PgnToken.RestOfLineComment.Token)
                 {
                     _inComment = true;
                     ChangeState(this, _restOfLineCommentState);
                 }
-                else if (c == PgnToken.LeftParenthesis.Token)
+                else if (current == PgnToken.TextCommentBegin.Token)
                 {
                     _inComment = true;
                     ChangeState(this, _parenthesisCommentState);
                 }
-                else if (c == PgnToken.RightBracket.Token)
+                else if (current == PgnToken.TagEnd.Token)
                 {
                     currentGame.AddTag(PgnTag.Parse(new string(_stateBuffer.ToArray())));
                     ChangeState(this, _initState);
                 }
                 else
                 {
-                    _stateBuffer.Add(c);
+                    _stateBuffer.Add(current);
                 }
 
                 return PgnParseResult.None;

@@ -34,15 +34,15 @@ namespace CChessCore.Pgn
             {
             }
 
-            public override PgnParseResult Parse(char c, PgnGame currentGame)
+            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
             {
-                if (c == PgnToken.RightParenthesis.Token)
+                if (current == PgnToken.TextCommentEnd.Token)
                 {
                     GoToPreviousState();
                 }
                 else
                 {
-                    _stateBuffer.Add(c);
+                    _stateBuffer.Add(current);
                 }
 
                 return PgnParseResult.None;

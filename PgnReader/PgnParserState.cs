@@ -42,7 +42,7 @@ namespace CChessCore.Pgn
                 _stateBuffer = new List<char>(stateBufferSize);
             }
 
-            public abstract PgnParseResult Parse(char c, PgnGame currentGame);
+            public abstract PgnParseResult Parse(char current, char next, PgnGame currentGame);
             public virtual void OnExit() { }
             public virtual void OnEnter()
             {

@@ -59,34 +59,34 @@ namespace CChessCore.Pgn
                     _singleMoveBuffer.Clear();
                 }
             }
-            public override PgnParseResult Parse(char c, PgnGame currentGame)
+            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
             {
-                if (c == PgnToken.RestOfLineComment.Token)
+                if (current == PgnToken.RestOfLineComment.Token)
                 {
                     _inComment = true;
                     ChangeState(this, _restOfLineCommentState);
                 }
-                else if (c == PgnToken.LeftParenthesis.Token)
+                else if (current == PgnToken.TextCommentBegin.Token)
                 {
                     _inComment = true;
                     ChangeState(this, _parenthesisCommentState);
                 }
-                else if(c == ' ' && _singleMoveBuffer.Count > 0)
+                else if(current == ' ' && _singleMoveBuffer.Count > 0)
                 {
                     var move = new string(_singleMoveBuffer.ToArray()).Trim();
                     if(!string.IsNullOrWhiteSpace(move))
                     {
                         _pgnMoves.AddMove(new PgnMove(move));
-                        _stateBuffer.Add(c);
+                        _stateBuffer.Add(current);
                         _singleMoveBuffer.Clear();
                     }
                 }
-                else if(c == PgnToken.Period.Token)
+                else if(current == PgnToken.Period.Token)
                 {
                     _singleMoveBuffer.Clear();
-                    _stateBuffer.Add(c);
+                    _stateBuffer.Add(current);
                 }
-                else if (c == PgnToken.LeftBracket.Token || c == '\0')
+                else if (current == PgnToken.TagBegin.Token || current == '\0')
                 {
                     string termination = new string(_singleMoveBuffer.ToArray()).Trim();
                     foreach(var result in PgnReader.Results)
@@ -116,18 +116,18 @@ namespace CChessCore.Pgn
                     ChangeState(this, _tagSectionState);
                     return PgnParseResult.EndOfGame;
                 }
-                else if (c == '\n')
+                else if (current == '\n')
                 {
                     _stateBuffer.Add(' ');
                 }
-                else if (c == '\r')
+                else if (current == '\r')
                 {
                     //remove linebreaks
                 }
                 else
                 {
-                    _stateBuffer.Add(c);
-                    _singleMoveBuffer.Add(c);
+                    _stateBuffer.Add(current);
+                    _singleMoveBuffer.Add(current);
                 }
 
                 return PgnParseResult.None;
