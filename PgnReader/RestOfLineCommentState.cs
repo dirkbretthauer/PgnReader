@@ -36,9 +36,14 @@ namespace CChessCore.Pgn
 
             public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
             {
-                if (current == '\n')
+                if(current == PgnToken.RestOfLineComment.Token && _stateBuffer.Count == 0)
                 {
-                    GoToPreviousState();
+                    //ignore 
+                }
+                else if (current == '\n')
+                {
+                    _currentMove.Comment = GetStateBuffer();
+                    GoToPreviousState(_currentMove);
                 }
                 else
                 {

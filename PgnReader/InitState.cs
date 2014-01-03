@@ -36,9 +36,9 @@ namespace CChessCore.Pgn
             {
             }
 
-            public override void OnEnter()
+            public override void OnEnter(PgnMove currentMove)
             {
-                base.OnEnter();
+                base.OnEnter(currentMove);
                 _isEndOfLine = false;
             }
 
@@ -70,7 +70,7 @@ namespace CChessCore.Pgn
                 }
                 else if(current == PgnToken.TextCommentBegin.Token)
                 {
-                    ChangeState(this, _parenthesisCommentState);
+                    ChangeState(this, _textCommentState);
                 }
                 else if(current == PgnToken.TagBegin.Token)
                 {

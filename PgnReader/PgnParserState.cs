@@ -35,6 +35,7 @@ namespace CChessCore.Pgn
             protected readonly PgnReader _reader;
             protected PgnParserState _previousState;
             protected List<char> _stateBuffer;
+            protected PgnMove _currentMove;
 
             protected PgnParserState(PgnReader reader, int stateBufferSize = 256)
             {
@@ -44,22 +45,23 @@ namespace CChessCore.Pgn
 
             public abstract PgnParseResult Parse(char current, char next, PgnGame currentGame);
             public virtual void OnExit() { }
-            public virtual void OnEnter()
+            public virtual void OnEnter(PgnMove currentMove)
             {
+                _currentMove = currentMove;
                 _stateBuffer.Clear();
             }
 
-            protected void ChangeState(PgnParserState oldState, PgnParserState newState)
+            protected void ChangeState(PgnParserState oldState, PgnParserState newState, PgnMove currentMove = null)
             {
                 this.OnExit();
                 _reader.SetState(newState);
                 newState._previousState = oldState;
-                newState.OnEnter();
+                newState.OnEnter(currentMove);
             }
 
-            protected void GoToPreviousState()
+            protected void GoToPreviousState(PgnMove move)
             {
-                ChangeState(this, _previousState);
+                ChangeState(this, _previousState, move);
             }
 
             internal string GetStateBuffer()

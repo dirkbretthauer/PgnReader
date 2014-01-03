@@ -25,32 +25,33 @@
 
 namespace CChessCore.Pgn
 {
-    public class PgnToken
+    public partial class PgnReader
     {
-        public static PgnToken Period = new PgnToken('.');
-        public static PgnToken Asterisk = new PgnToken('*');
-        public static PgnToken TagBegin = new PgnToken('[');
-        public static PgnToken TagEnd = new PgnToken(']');
-        public static PgnToken TextCommentBegin = new PgnToken('{');
-        public static PgnToken TextCommentEnd = new PgnToken('}');
-        public static PgnToken RecursiveVariationBegin = new PgnToken('(');
-        public static PgnToken RecursiveVariationEnd = new PgnToken(')');
-        public static PgnToken NumericAnnotationGlyph = new PgnToken('$');
-        public static PgnToken RestOfLineComment = new PgnToken(';');
-        public static PgnToken EscapeLine = new PgnToken('%');
-
-        private readonly string _token;
-        public char Token { get; private set; }
-
-        private PgnToken(char token)
+        private class AnnotationState : PgnParserState
         {
-            Token = token;
-            _token = token.ToString();
-        }
+            public AnnotationState(PgnReader reader)
+                : base(reader)
+            {
+            }
 
-        public override string ToString()
-        {
-            return _token;
+            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+            {
+                if(current == PgnToken.NumericAnnotationGlyph.Token && _stateBuffer.Count == 0)
+                {
+                    //ignore 
+                }
+                else if (current == ' ')
+                {
+                    _currentMove.Annotation = GetStateBuffer();
+                    GoToPreviousState(_currentMove);
+                }
+                else
+                {
+                    _stateBuffer.Add(current);
+                }
+
+                return PgnParseResult.None;
+            }
         }
     }
 }

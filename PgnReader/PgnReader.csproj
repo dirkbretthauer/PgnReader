@@ -38,7 +38,9 @@
   <ItemGroup>
     <Compile Include="InitState.cs" />
     <Compile Include="MovesSectionState.cs" />
-    <Compile Include="ParenthesisCommentState.cs" />
+    <Compile Include="RecursiveVariationState.cs" />
+    <Compile Include="AnnotationState.cs" />
+    <Compile Include="TextCommentState.cs" />
     <Compile Include="PgnGame.cs" />
     <Compile Include="PgnMove.cs" />
     <Compile Include="PgnMoves.cs" />

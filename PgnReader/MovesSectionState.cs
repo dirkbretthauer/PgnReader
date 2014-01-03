@@ -31,7 +31,6 @@ namespace CChessCore.Pgn
         private class MovesSectionState : PgnParserState
         {
             private bool _inComment;
-            private string _comment;
             protected List<char> _singleMoveBuffer;
             private PgnMoves _pgnMoves;
 
@@ -41,20 +40,23 @@ namespace CChessCore.Pgn
                 _singleMoveBuffer = new List<char>(255);
             }
 
-            public override void OnEnter()
+            public override void OnEnter(PgnMove currentMove)
             {
                 if(!_inComment)
                 {
-                    base.OnEnter();
+                    base.OnEnter(currentMove);
                     _singleMoveBuffer.Clear();
                     _stateBuffer.Add('1');
                     _stateBuffer.Add('.');
                     _pgnMoves = new PgnMoves();
+                    _currentMove = new PgnMove();
                 }
                 else
                 {
-                    _pgnMoves.AddMove(new PgnMove(new string(_singleMoveBuffer.ToArray()), _previousState.GetStateBuffer()));
+                    _currentMove.Move = new string(_singleMoveBuffer.ToArray());
+                    _pgnMoves.AddMove(_currentMove);
 
+                    _currentMove = new PgnMove();
                     _inComment = false;
                     _singleMoveBuffer.Clear();
                 }
@@ -64,27 +66,53 @@ namespace CChessCore.Pgn
                 if (current == PgnToken.RestOfLineComment.Token)
                 {
                     _inComment = true;
-                    ChangeState(this, _restOfLineCommentState);
+                    ChangeState(this, _restOfLineCommentState, _currentMove);
                 }
                 else if (current == PgnToken.TextCommentBegin.Token)
                 {
                     _inComment = true;
-                    ChangeState(this, _parenthesisCommentState);
+                    ChangeState(this, _textCommentState, _currentMove);
                 }
                 else if(current == ' ' && _singleMoveBuffer.Count > 0)
                 {
-                    var move = new string(_singleMoveBuffer.ToArray()).Trim();
-                    if(!string.IsNullOrWhiteSpace(move))
+                    if(next == PgnToken.NumericAnnotationGlyph.Token)
                     {
-                        _pgnMoves.AddMove(new PgnMove(move));
-                        _stateBuffer.Add(current);
-                        _singleMoveBuffer.Clear();
+                        _inComment = true;
+                        ChangeState(this, _annotationState, _currentMove);
+                    }
+                    else if(next == PgnToken.TextCommentBegin.Token)
+                    {
+                        _inComment = true;
+                        ChangeState(this, _textCommentState, _currentMove);
+                    }
+                    else if(next == PgnToken.RestOfLineComment.Token)
+                    {
+                        _inComment = true;
+                        ChangeState(this, _restOfLineCommentState);
+                    }
+                    else if(next == PgnToken.RecursiveVariationBegin.Token)
+                    {
+                        _inComment = true;
+                        ChangeState(this, _recursiveVariationState, _currentMove);
+                    }
+                    else
+                    {
+                        var move = new string(_singleMoveBuffer.ToArray()).Trim();
+                        if(!string.IsNullOrWhiteSpace(move))
+                        {
+                            _currentMove.Move = move;
+                            _pgnMoves.AddMove(_currentMove);
+                            _stateBuffer.Add(current);
+                            _singleMoveBuffer.Clear();
+                            _currentMove = new PgnMove();
+                        }
                     }
                 }
                 else if(current == PgnToken.Period.Token)
                 {
                     _singleMoveBuffer.Clear();
                     _stateBuffer.Add(current);
+                    _currentMove = new PgnMove();
                 }
                 else if (current == PgnToken.TagBegin.Token || current == '\0')
                 {

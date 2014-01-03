@@ -45,9 +45,11 @@ namespace CChessCore.Pgn
         private PgnParserState _currentState;
         private static PgnParserState _initState;
         private static PgnParserState _restOfLineCommentState;
-        private static PgnParserState _parenthesisCommentState;
+        private static PgnParserState _textCommentState;
         private static PgnParserState _tagSectionState;
         private static PgnParserState _movesSectionState;
+        private static PgnParserState _recursiveVariationState;
+        private static PgnParserState _annotationState;
         #endregion
 
         /// <summary>
@@ -82,10 +84,12 @@ namespace CChessCore.Pgn
         public PgnReader(TextReader reader, int bufferSize)
         {
             _restOfLineCommentState = new RestOfLineCommentState(this);
-            _parenthesisCommentState = new ParenthesisCommentState(this);
+            _textCommentState = new TextCommentState(this);
             _tagSectionState = new TagSectionState(this);
             _movesSectionState = new MovesSectionState(this);
             _initState = new InitState(this);
+            _recursiveVariationState = new RecursiveVariationState(this);
+            _annotationState = new AnnotationState(this);
 
             _currentState = _initState;
 

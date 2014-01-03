@@ -38,11 +38,11 @@ namespace CChessCore.Pgn
             {
             }
 
-            public override void OnEnter()
+            public override void OnEnter(PgnMove currentMove)
             {
                 if (!_inComment)
                 {
-                    base.OnEnter();
+                    base.OnEnter(currentMove);
                 }
                 else
                 {
@@ -60,7 +60,7 @@ namespace CChessCore.Pgn
                 else if (current == PgnToken.TextCommentBegin.Token)
                 {
                     _inComment = true;
-                    ChangeState(this, _parenthesisCommentState);
+                    ChangeState(this, _textCommentState);
                 }
                 else if (current == PgnToken.TagEnd.Token)
                 {

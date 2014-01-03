@@ -30,8 +30,19 @@ namespace CChessCore.Pgn
 {
     public class PgnMove
     {
-        public string Move { get; private set; }
-        public string Comment { get; private set; }
+        public string Move { get; set; }
+
+        public string Comment { get; set; }
+
+        public string Variation { get; set; }
+
+        public string Annotation { get; set; }
+
+        public PgnMove() :
+            this(string.Empty)
+        {
+
+        }
 
         public PgnMove(string move) :
             this(move, string.Empty)
@@ -39,10 +50,24 @@ namespace CChessCore.Pgn
             
         }
 
-        public PgnMove(string move, string comment)
+        public PgnMove(string move, string comment) :
+            this(string.Empty, string.Empty, string.Empty)
+        {
+
+        }
+
+        public PgnMove(string move, string comment, string variation) :
+            this(string.Empty, string.Empty, string.Empty, string.Empty)
+        {
+
+        }
+
+        public PgnMove(string move, string comment, string variation, string annotation)
         {
             Move = move;
             Comment = comment;
+            Variation = variation;
+            Annotation = annotation;
         }
     }
 }
