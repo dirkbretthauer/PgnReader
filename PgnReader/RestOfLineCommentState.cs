@@ -42,7 +42,7 @@ namespace CChessCore.Pgn
                 }
                 else if (current == '\n')
                 {
-                    _currentMove.Comment = GetStateBuffer();
+                    _currentMove.Comment = GetStateBuffer().Trim();
                     GoToPreviousState(_currentMove);
                 }
                 else
