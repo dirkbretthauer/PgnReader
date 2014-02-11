@@ -88,7 +88,7 @@ namespace CChessCore.Pgn
                     else if(next == PgnToken.RestOfLineComment.Token)
                     {
                         _inComment = true;
-                        ChangeState(this, _restOfLineCommentState);
+                        ChangeState(this, _restOfLineCommentState, _currentMove);
                     }
                     else if(next == PgnToken.RecursiveVariationBegin.Token)
                     {
@@ -141,7 +141,7 @@ namespace CChessCore.Pgn
                     _pgnMoves.Termination = termination;
                     _pgnMoves.MoveSection = new string(_stateBuffer.ToArray());
                     currentGame.AddMoves(_pgnMoves);
-                    ChangeState(this, _tagSectionState);
+                    ChangeState(this, _tagSectionState, null);
                     return PgnParseResult.EndOfGame;
                 }
                 else if (current == '\n')
