@@ -53,14 +53,10 @@ namespace CChessCore.Pgn
                 }
                 else
                 {
-                    _currentMove.Move = new string(_singleMoveBuffer.ToArray());
-                    _pgnMoves.AddMove(_currentMove);
-
-                    _currentMove = new PgnMove();
                     _inComment = false;
-                    _singleMoveBuffer.Clear();
                 }
             }
+
             public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
             {
                 if (current == PgnToken.RestOfLineComment.Token)
@@ -75,7 +71,11 @@ namespace CChessCore.Pgn
                 }
                 else if(current == ' ' && _singleMoveBuffer.Count > 0)
                 {
-                    if(next == PgnToken.NumericAnnotationGlyph.Token)
+                    if(next == '\n' || next == ' ' || next == '\r')
+                    {
+                        //do nothing
+                    }
+                    else if(next == PgnToken.NumericAnnotationGlyph.Token)
                     {
                         _inComment = true;
                         ChangeState(this, _annotationState, _currentMove);
@@ -108,7 +108,7 @@ namespace CChessCore.Pgn
                         }
                     }
                 }
-                else if(current == PgnToken.Period.Token)
+                else if(current == PgnToken.Period.Token && next != PgnToken.Period.Token)
                 {
                     _singleMoveBuffer.Clear();
                     _stateBuffer.Add(current);

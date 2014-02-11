@@ -38,6 +38,8 @@ namespace CChessCore.Pgn
 
         public string Annotation { get; set; }
 
+        public bool IsValid { get { return !string.IsNullOrEmpty(Move); } }
+
         public PgnMove() :
             this(string.Empty)
         {
