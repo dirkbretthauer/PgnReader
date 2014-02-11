@@ -51,7 +51,7 @@ namespace CChessCore.Pgn
                 _stateBuffer.Clear();
             }
 
-            protected void ChangeState(PgnParserState oldState, PgnParserState newState, PgnMove currentMove)
+            protected void ChangeState(PgnParserState oldState, PgnParserState newState, PgnMove currentMove = null)
             {
                 this.OnExit();
                 _reader.SetState(newState);

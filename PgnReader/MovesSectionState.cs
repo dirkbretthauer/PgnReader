@@ -141,7 +141,7 @@ namespace CChessCore.Pgn
                     _pgnMoves.Termination = termination;
                     _pgnMoves.MoveSection = new string(_stateBuffer.ToArray());
                     currentGame.AddMoves(_pgnMoves);
-                    ChangeState(this, _tagSectionState, null);
+                    ChangeState(this, _tagSectionState);
                     return PgnParseResult.EndOfGame;
                 }
                 else if (current == '\n')
