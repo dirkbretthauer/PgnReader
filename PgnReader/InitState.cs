@@ -25,13 +25,13 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    public partial class PgnParserStatemachine
     {
         private class InitState : PgnParserState
         {
             private bool _isEndOfLine;
 
-            public InitState(PgnReader reader)
+            public InitState(PgnParserStatemachine reader)
                 : base(reader, 0)
             {
             }

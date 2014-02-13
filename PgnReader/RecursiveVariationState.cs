@@ -25,12 +25,12 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    public partial class PgnParserStatemachine
     {
         private class RecursiveVariationState : PgnParserState
         {
 
-            public RecursiveVariationState(PgnReader reader)
+            public RecursiveVariationState(PgnParserStatemachine reader)
                 : base(reader)
             {
             }

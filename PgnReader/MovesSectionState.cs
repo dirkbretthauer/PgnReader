@@ -26,7 +26,7 @@
 using System.Collections.Generic;
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    public partial class PgnParserStatemachine
     {
         private class MovesSectionState : PgnParserState
         {
@@ -34,7 +34,7 @@ namespace CChessCore.Pgn
             protected List<char> _singleMoveBuffer;
             private PgnMoves _pgnMoves;
 
-            public MovesSectionState(PgnReader reader)
+            public MovesSectionState(PgnParserStatemachine reader)
                 : base(reader, 1024)
             {
                 _singleMoveBuffer = new List<char>(255);

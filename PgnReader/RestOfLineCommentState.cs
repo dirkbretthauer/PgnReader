@@ -25,11 +25,11 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    public partial class PgnParserStatemachine
     {
         private class RestOfLineCommentState : PgnParserState
         {
-            public RestOfLineCommentState(PgnReader reader)
+            public RestOfLineCommentState(PgnParserStatemachine reader)
                 : base(reader)
             {
             }

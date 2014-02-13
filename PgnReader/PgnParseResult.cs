@@ -25,12 +25,9 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    public enum PgnParseResult
     {
-        public enum PgnParseResult
-        {
-            None,
-            EndOfGame,
-        }
+        None,
+        EndOfGame,
     }
 }

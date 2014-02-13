@@ -28,12 +28,12 @@ using System.Linq;
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    public partial class PgnParserStatemachine
     {
         private class TagSectionState : PgnParserState
         {
             private bool _inComment = false;
-            public TagSectionState(PgnReader reader)
+            public TagSectionState(PgnParserStatemachine reader)
                 : base(reader)
             {
             }

@@ -28,16 +28,16 @@ using System.Collections.Generic;
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    public partial class PgnParserStatemachine
     {
         protected abstract class PgnParserState
         {
-            protected readonly PgnReader _reader;
+            protected readonly PgnParserStatemachine _reader;
             protected PgnParserState _previousState;
             protected List<char> _stateBuffer;
             protected PgnMove _currentMove;
 
-            protected PgnParserState(PgnReader reader, int stateBufferSize = 256)
+            protected PgnParserState(PgnParserStatemachine reader, int stateBufferSize = 256)
             {
                 _reader = reader;
                 _stateBuffer = new List<char>(stateBufferSize);
