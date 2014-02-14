@@ -25,33 +25,23 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnParserStatemachine
+    internal class AnnotationState : PgnParserState
     {
-        private class AnnotationState : PgnParserState
+        public AnnotationState(PgnParserStatemachine reader)
+            : base(reader)
         {
-            public AnnotationState(PgnParserStatemachine reader)
-                : base(reader)
-            {
-            }
+        }
 
-            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
-            {
-                if(current == PgnToken.NumericAnnotationGlyph.Token && _stateBuffer.Count == 0)
-                {
-                    //ignore 
-                }
-                else if (current == ' ')
-                {
-                    _currentMove.Annotation = GetStateBuffer();
-                    GoToPreviousState(_currentMove);
-                }
-                else
-                {
-                    _stateBuffer.Add(current);
-                }
+        public override void OnExit()
+        {
+            _currentMove.Annotation = GetStateBuffer().Trim();
+        }
 
-                return PgnParseResult.None;
-            }
+        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        {
+            _stateBuffer.Add(current);
+                
+            return PgnParseResult.None;
         }
     }
 }

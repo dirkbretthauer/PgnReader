@@ -25,33 +25,23 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnParserStatemachine
+    internal class RestOfLineCommentState : PgnParserState
     {
-        private class RestOfLineCommentState : PgnParserState
+        public RestOfLineCommentState(PgnParserStatemachine reader)
+            : base(reader)
         {
-            public RestOfLineCommentState(PgnParserStatemachine reader)
-                : base(reader)
-            {
-            }
+        }
 
-            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
-            {
-                if(current == PgnToken.RestOfLineComment.Token && _stateBuffer.Count == 0)
-                {
-                    //ignore 
-                }
-                else if (current == '\n')
-                {
-                    _currentMove.Comment = GetStateBuffer().Trim();
-                    GoToPreviousState(_currentMove);
-                }
-                else
-                {
-                    _stateBuffer.Add(current);
-                }
+        public override void OnExit()
+        {
+            _currentMove.Comment = GetStateBuffer().Trim();
+        }
 
-                return PgnParseResult.None;
-            }
+        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        {
+            _stateBuffer.Add(current);
+
+            return PgnParseResult.None;
         }
     }
 }

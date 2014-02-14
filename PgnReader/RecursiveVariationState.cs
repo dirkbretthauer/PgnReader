@@ -25,34 +25,24 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnParserStatemachine
+    internal class RecursiveVariationState : PgnParserState
     {
-        private class RecursiveVariationState : PgnParserState
+
+        public RecursiveVariationState(PgnParserStatemachine reader)
+            : base(reader)
         {
+        }
 
-            public RecursiveVariationState(PgnParserStatemachine reader)
-                : base(reader)
-            {
-            }
+        public override void OnExit()
+        {
+            _currentMove.Comment = GetStateBuffer().Trim();
+        }
 
-            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
-            {
-                if(current == PgnToken.RecursiveVariationBegin.Token && _stateBuffer.Count == 0)
-                {
-                    //ignore 
-                }
-                else if (current == PgnToken.RecursiveVariationEnd.Token)
-                {
-                    _currentMove.Comment = GetStateBuffer();
-                    GoToPreviousState(_currentMove);
-                }
-                else
-                {
-                    _stateBuffer.Add(current);
-                }
+        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        {
+            _stateBuffer.Add(current);
 
-                return PgnParseResult.None;
-            }
+            return PgnParseResult.None;
         }
     }
 }

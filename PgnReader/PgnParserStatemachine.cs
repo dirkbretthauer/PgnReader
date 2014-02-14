@@ -30,19 +30,11 @@ using System.Text;
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnParserStatemachine
+    public class PgnParserStatemachine
     {
         #region fields
-        private bool _disposed;
-        private readonly TextReader _reader;
-        private char[] _readerBuffer;
-        private int _readerBufferPosition;
-        private int _charsRead;
-        private char _nextChar = '\0';
-        private Char? _currentChar;
-        private readonly IList<PgnGame> _games;
-
         private PgnParserState _currentState;
+        private PgnParserState _previousState;
         private static PgnParserState _initState;
         private static PgnParserState _restOfLineCommentState;
         private static PgnParserState _textCommentState;
@@ -59,6 +51,7 @@ namespace CChessCore.Pgn
 
         public PgnParserStatemachine()
         {
+
             _restOfLineCommentState = new RestOfLineCommentState(this);
             _textCommentState = new TextCommentState(this);
             _tagSectionState = new TagSectionState(this);
@@ -67,17 +60,56 @@ namespace CChessCore.Pgn
             _recursiveVariationState = new RecursiveVariationState(this);
             _annotationState = new AnnotationState(this);
 
+            _initState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
+            _initState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
+            _initState.AddTransition(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
+            _initState.AddTransition(() => _movesSectionState, c => c == PgnToken.Period.Token);
+
+            _annotationState.AddTransition(GetPreviousState, c => c == ' ');
+
+            _recursiveVariationState.AddTransition(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token);
+
+            _restOfLineCommentState.AddTransition(GetPreviousState, c => c == '\n');
+
+            _textCommentState.AddTransition(GetPreviousState, c => c == PgnToken.TextCommentEnd.Token);
+
+            _tagSectionState.AddTransition(() => _initState, c => c == PgnToken.TagEnd.Token);
+            _tagSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
+            _tagSectionState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
+
+            _movesSectionState.AddTransition(() => _annotationState, c => c == PgnToken.NumericAnnotationGlyph.Token);
+            _movesSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
+            _movesSectionState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
+            _movesSectionState.AddTransition(() => _recursiveVariationState, c => c == PgnToken.RecursiveVariationBegin.Token);
+
+
             _currentState = _initState;
         }
 
-        private void SetState(PgnParserState newState)
+        private PgnParserState GetPreviousState()
         {
+            return _previousState;
+        }
+
+        internal void SetState(PgnParserState newState)
+        {
+            _previousState = _currentState;
             _currentState = newState;
         }
 
         internal PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
-            return _currentState.Parse(current, next, currentGame);
+            _currentState.TryTransite(current);
+            
+            var parseResult = _currentState.Parse(current, next, currentGame);
+            if(parseResult == PgnParseResult.EndOfGame)
+            {
+                _currentState.OnExit();
+                SetState(_initState);
+                _initState.OnEnter(new PgnMove());
+            }
+
+            return parseResult;
         }
     }
 }

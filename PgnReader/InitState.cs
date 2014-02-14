@@ -25,64 +25,24 @@
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnParserStatemachine
+    internal class InitState : PgnParserState
     {
-        private class InitState : PgnParserState
+        private bool _isEndOfLine;
+
+        public InitState(PgnParserStatemachine reader)
+            : base(reader, 0)
         {
-            private bool _isEndOfLine;
+        }
 
-            public InitState(PgnParserStatemachine reader)
-                : base(reader, 0)
-            {
-            }
+        public override void OnEnter(PgnMove currentMove)
+        {
+            base.OnEnter(currentMove);
+            _isEndOfLine = false;
+        }
 
-            public override void OnEnter(PgnMove currentMove)
-            {
-                base.OnEnter(currentMove);
-                _isEndOfLine = false;
-            }
-
-            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
-            {
-                if(current == '\n')
-                {
-                    if(!_isEndOfLine)
-                    {
-                        _isEndOfLine = true;
-                    }
-                    else//its an empty line
-                    {
-                        if(currentGame.HasTags)
-                        {
-                            ChangeState(this, _movesSectionState);
-                            return PgnParseResult.None;
-                        }
-                    }
-                }
-                else
-                {
-                    _isEndOfLine = false;
-                }
-
-                if(current == PgnToken.RestOfLineComment.Token)
-                {
-                    ChangeState(this, _restOfLineCommentState);
-                }
-                else if(current == PgnToken.TextCommentBegin.Token)
-                {
-                    ChangeState(this, _textCommentState);
-                }
-                else if(current == PgnToken.TagBegin.Token)
-                {
-                    ChangeState(this, _tagSectionState);
-                }
-                else if(current == PgnToken.Period.Token)
-                {
-                    ChangeState(this, _movesSectionState);
-                }
-
-                return PgnParseResult.None;
-            }
+        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        {
+            return PgnParseResult.None;
         }
     }
 }

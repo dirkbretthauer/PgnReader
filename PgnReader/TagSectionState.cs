@@ -28,52 +28,39 @@ using System.Linq;
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnParserStatemachine
+    internal class TagSectionState : PgnParserState
     {
-        private class TagSectionState : PgnParserState
+        private bool _inComment = false;
+        private PgnGame _current;
+
+        public TagSectionState(PgnParserStatemachine reader)
+            : base(reader)
         {
-            private bool _inComment = false;
-            public TagSectionState(PgnParserStatemachine reader)
-                : base(reader)
-            {
-            }
+        }
 
-            public override void OnEnter(PgnMove currentMove)
+        public override void OnEnter(PgnMove currentMove)
+        {
+            if (!_inComment)
             {
-                if (!_inComment)
-                {
-                    base.OnEnter(currentMove);
-                }
-                else
-                {
-                    _inComment = false;
-                }
+                base.OnEnter(currentMove);
             }
-
-            public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+            else
             {
-                if (current == PgnToken.RestOfLineComment.Token)
-                {
-                    _inComment = true;
-                    ChangeState(this, _restOfLineCommentState);
-                }
-                else if (current == PgnToken.TextCommentBegin.Token)
-                {
-                    _inComment = true;
-                    ChangeState(this, _textCommentState);
-                }
-                else if (current == PgnToken.TagEnd.Token)
-                {
-                    currentGame.AddTag(PgnTag.Parse(new string(_stateBuffer.ToArray())));
-                    ChangeState(this, _initState);
-                }
-                else
-                {
-                    _stateBuffer.Add(current);
-                }
-
-                return PgnParseResult.None;
+                _inComment = false;
             }
+        }
+
+        public override void OnExit()
+        {
+            _current.AddTag(PgnTag.Parse(new string(_stateBuffer.ToArray())));
+        }
+
+        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        {
+            _current = currentGame;
+            _stateBuffer.Add(current);
+            
+            return PgnParseResult.None;
         }
     }
 }
