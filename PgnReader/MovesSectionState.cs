@@ -44,8 +44,6 @@ namespace CChessCore.Pgn
             {
                 base.OnEnter(currentMove);
                 _singleMoveBuffer.Clear();
-                _stateBuffer.Add('1');
-                _stateBuffer.Add('.');
                 _pgnMoves = new PgnMoves();
                 _currentMove = new PgnMove();
             }
@@ -53,6 +51,48 @@ namespace CChessCore.Pgn
             {
                 _inComment = false;
             }
+        }
+
+        public override void OnExit()
+        {
+            var temp = GetStateBuffer().Trim();
+            if(!string.IsNullOrWhiteSpace(temp))
+            {
+                _currentMove.Move = temp;
+            }
+        }
+
+        public void TerminateGame(PgnGame game)
+        {
+            string termination = new string(_singleMoveBuffer.ToArray()).Trim();
+            foreach(var result in PgnReader.Results)
+            {
+                if(termination.EndsWith(result))
+                {
+                    _pgnMoves.Termination = result;
+                }
+            }
+            if(string.IsNullOrWhiteSpace(_pgnMoves.Termination))
+            {
+                if(_pgnMoves.Moves.Count > 0)
+                {
+
+                    termination = _pgnMoves.Moves[_pgnMoves.Moves.Count - 1].Move;
+
+                    foreach(var result in PgnReader.Results)
+                    {
+                        if(termination.EndsWith(result))
+                        {
+                            _pgnMoves.Moves.RemoveAt(_pgnMoves.Moves.Count - 1);
+                            _pgnMoves.Termination = result;
+                        }
+                    }
+                }
+            }
+
+            _pgnMoves.Termination = termination;
+            _pgnMoves.MoveSection = new string(_stateBuffer.ToArray());
+            game.AddMoves(_pgnMoves);
         }
 
         public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
@@ -75,41 +115,20 @@ namespace CChessCore.Pgn
             {
                 _singleMoveBuffer.Clear();
                 _stateBuffer.Add(current);
-                _currentMove = new PgnMove();
             }
             else if (current == PgnToken.TagBegin.Token || current == '\0')
             {
-                string termination = new string(_singleMoveBuffer.ToArray()).Trim();
-                foreach(var result in PgnReader.Results)
-                {
-                    if(termination.EndsWith(result))
-                    {
-                        _pgnMoves.Termination = result;
-                    }
-                }
-                if(string.IsNullOrWhiteSpace(_pgnMoves.Termination))
-                {
-                    termination = _pgnMoves.Moves[_pgnMoves.Moves.Count - 1].Move;
-
-                    foreach(var result in PgnReader.Results)
-                    {
-                        if(termination.EndsWith(result))
-                        {
-                            _pgnMoves.Moves.RemoveAt(_pgnMoves.Moves.Count - 1);
-                            _pgnMoves.Termination = result;
-                        }
-                    }
-                }
-
-                _pgnMoves.Termination = termination;
-                _pgnMoves.MoveSection = new string(_stateBuffer.ToArray());
-                currentGame.AddMoves(_pgnMoves);
-                
+                TerminateGame(currentGame);
                 return PgnParseResult.EndOfGame;
             }
-            else if (current == '\n')
+            else if (char.IsWhiteSpace(current))
             {
                 _stateBuffer.Add(' ');
+                var temp = new string(_singleMoveBuffer.ToArray()).Trim();
+                if(!string.IsNullOrWhiteSpace(temp))
+                {
+                    _currentMove.Move = temp;
+                }
             }
             else if (current == '\r')
             {

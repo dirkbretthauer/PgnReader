@@ -30,7 +30,6 @@ namespace CChessCore.Pgn
 {
     internal class TagSectionState : PgnParserState
     {
-        private bool _inComment = false;
         private PgnGame _current;
 
         public TagSectionState(PgnParserStatemachine reader)
@@ -40,14 +39,7 @@ namespace CChessCore.Pgn
 
         public override void OnEnter(PgnMove currentMove)
         {
-            if (!_inComment)
-            {
-                base.OnEnter(currentMove);
-            }
-            else
-            {
-                _inComment = false;
-            }
+            base.OnEnter(currentMove);
         }
 
         public override void OnExit()

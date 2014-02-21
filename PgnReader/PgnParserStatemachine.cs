@@ -39,7 +39,7 @@ namespace CChessCore.Pgn
         private static PgnParserState _restOfLineCommentState;
         private static PgnParserState _textCommentState;
         private static PgnParserState _tagSectionState;
-        private static PgnParserState _movesSectionState;
+        private static MovesSectionState _movesSectionState;
         private static PgnParserState _recursiveVariationState;
         private static PgnParserState _annotationState;
         #endregion
@@ -63,7 +63,7 @@ namespace CChessCore.Pgn
             _initState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _initState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
             _initState.AddTransition(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
-            _initState.AddTransition(() => _movesSectionState, c => c == PgnToken.Period.Token);
+            _initState.AddTransition(() => _movesSectionState, c => char.IsDigit(c));
 
             _annotationState.AddTransition(GetPreviousState, c => c == ' ');
 
@@ -81,6 +81,7 @@ namespace CChessCore.Pgn
             _movesSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _movesSectionState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
             _movesSectionState.AddTransition(() => _recursiveVariationState, c => c == PgnToken.RecursiveVariationBegin.Token);
+            _movesSectionState.AddTransition(() => _initState, c => c == PgnToken.TagBegin.Token, game => _movesSectionState.TerminateGame(game) );
 
 
             _currentState = _initState;
@@ -99,17 +100,9 @@ namespace CChessCore.Pgn
 
         internal PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
-            _currentState.TryTransite(current);
+            _currentState.TryTransite(current, currentGame);
             
-            var parseResult = _currentState.Parse(current, next, currentGame);
-            if(parseResult == PgnParseResult.EndOfGame)
-            {
-                _currentState.OnExit();
-                SetState(_initState);
-                _initState.OnEnter(new PgnMove());
-            }
-
-            return parseResult;
+            return _currentState.Parse(current, next, currentGame);
         }
     }
 }

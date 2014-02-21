@@ -30,7 +30,9 @@ namespace CChessCore.Pgn
 {
     internal abstract class PgnParserState
     {
-        private IList<Tuple<Func<char, bool>, Func<PgnParserState>>> _transitions = new List<Tuple<Func<char, bool>, Func<PgnParserState>>>();
+        private IList<Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>> _transitions =
+            new List<Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>>();
+
         protected readonly PgnParserStatemachine _statemachine;
         
         protected List<char> _stateBuffer;
@@ -54,16 +56,25 @@ namespace CChessCore.Pgn
 
         public void AddTransition(Func<PgnParserState> next, Func<char, bool> condition)
         {
-            _transitions.Add(new Tuple<Func<char, bool>, Func<PgnParserState>>(condition, next));
+            _transitions.Add(new Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>(condition, next, null));
         }
 
-        public bool TryTransite(char current)
+        public void AddTransition(Func<PgnParserState> next, Func<char, bool> condition, Action<PgnGame> action)
+        {
+            _transitions.Add(new Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>(condition, next, action));
+        }
+
+        public bool TryTransite(char current, PgnGame game)
         {
             foreach(var item in _transitions)
             {
                 if(item.Item1(current))
                 {
                     ChangeState(this, item.Item2(), _currentMove);
+                    if(item.Item3 != null)
+                    {
+                        item.Item3(game);
+                    }
                     return true;
                 }
             }

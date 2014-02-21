@@ -27,21 +27,19 @@ namespace CChessCore.Pgn
 {
     internal class InitState : PgnParserState
     {
-        private bool _isEndOfLine;
-
         public InitState(PgnParserStatemachine reader)
             : base(reader, 0)
         {
         }
 
-        public override void OnEnter(PgnMove currentMove)
-        {
-            base.OnEnter(currentMove);
-            _isEndOfLine = false;
-        }
-
         public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
+            if(current == PgnToken.TagBegin.Token)
+            {
+                _currentMove = new PgnMove();
+
+                return PgnParseResult.EndOfGame;
+            }
             return PgnParseResult.None;
         }
     }
