@@ -39,7 +39,22 @@ namespace CChessCore.Pgn
 
         public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
-            _stateBuffer.Add(current);
+            if(char.IsWhiteSpace(current) && char.IsWhiteSpace(next))
+            {
+                //remove double whitespaces
+            }
+            else if(char.IsWhiteSpace(current))
+            {
+                _stateBuffer.Add(' ');
+            }
+            else if(current == '\r')
+            {
+                //remove linebreaks
+            }
+            else
+            {
+                _stateBuffer.Add(current);
+            }
 
             return PgnParseResult.None;
         }

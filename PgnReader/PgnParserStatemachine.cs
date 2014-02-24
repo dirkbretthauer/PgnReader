@@ -63,7 +63,7 @@ namespace CChessCore.Pgn
             _initState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _initState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
             _initState.AddTransition(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
-            _initState.AddTransition(() => _movesSectionState, c => char.IsDigit(c));
+            _initState.AddTransition(() => _movesSectionState, c => char.IsDigit(c), game => _movesSectionState.InitGame(game));
 
             _annotationState.AddTransition(GetPreviousState, c => c == ' ');
 
@@ -81,8 +81,7 @@ namespace CChessCore.Pgn
             _movesSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _movesSectionState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
             _movesSectionState.AddTransition(() => _recursiveVariationState, c => c == PgnToken.RecursiveVariationBegin.Token);
-            _movesSectionState.AddTransition(() => _initState, c => c == PgnToken.TagBegin.Token, game => _movesSectionState.TerminateGame(game) );
-
+            _movesSectionState.AddTransition(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
 
             _currentState = _initState;
         }
@@ -100,9 +99,18 @@ namespace CChessCore.Pgn
 
         internal PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
-            _currentState.TryTransite(current, currentGame);
+            if(_currentState.TryTransite(current, currentGame))
+            {
+                return PgnParseResult.None;
+            }
             
-            return _currentState.Parse(current, next, currentGame);
+            var result = _currentState.Parse(current, next, currentGame);
+            if(result == PgnParseResult.EndOfGame)
+            {
+                _currentState.ChangeState(_initState);
+            }
+
+            return result;
         }
     }
 }

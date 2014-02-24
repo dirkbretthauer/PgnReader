@@ -50,5 +50,12 @@ namespace CChessCore.Pgn
         {
             Moves.Add(move);
         }
+
+        public void Clear()
+        {
+            Termination = string.Empty;
+            MoveSection = string.Empty;
+            Moves.Clear();
+        }
     }
 }

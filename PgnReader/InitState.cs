@@ -34,12 +34,6 @@ namespace CChessCore.Pgn
 
         public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
-            if(current == PgnToken.TagBegin.Token)
-            {
-                _currentMove = new PgnMove();
-
-                return PgnParseResult.EndOfGame;
-            }
             return PgnParseResult.None;
         }
     }

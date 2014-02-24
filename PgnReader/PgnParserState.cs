@@ -70,7 +70,7 @@ namespace CChessCore.Pgn
             {
                 if(item.Item1(current))
                 {
-                    ChangeState(this, item.Item2(), _currentMove);
+                    ChangeState(item.Item2(), _currentMove);
                     if(item.Item3 != null)
                     {
                         item.Item3(game);
@@ -82,9 +82,9 @@ namespace CChessCore.Pgn
             return false;
         }
 
-        protected void ChangeState(PgnParserState oldState, PgnParserState newState, PgnMove currentMove = null)
+        public void ChangeState(PgnParserState newState, PgnMove currentMove = null)
         {
-            this.OnExit();
+            OnExit();
             _statemachine.SetState(newState);
             
             newState.OnEnter(currentMove);

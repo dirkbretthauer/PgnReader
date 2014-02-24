@@ -28,29 +28,13 @@ namespace CChessCore.Pgn
 {
     internal class MovesSectionState : PgnParserState
     {
-        private bool _inComment;
         protected List<char> _singleMoveBuffer;
-        private PgnMoves _pgnMoves;
+        private PgnMoves _pgnMoves = new PgnMoves();
 
         public MovesSectionState(PgnParserStatemachine reader)
             : base(reader, 1024)
         {
             _singleMoveBuffer = new List<char>(255);
-        }
-
-        public override void OnEnter(PgnMove currentMove)
-        {
-            if(!_inComment)
-            {
-                base.OnEnter(currentMove);
-                _singleMoveBuffer.Clear();
-                _pgnMoves = new PgnMoves();
-                _currentMove = new PgnMove();
-            }
-            else
-            {
-                _inComment = false;
-            }
         }
 
         public override void OnExit()
@@ -62,42 +46,27 @@ namespace CChessCore.Pgn
             }
         }
 
-        public void TerminateGame(PgnGame game)
-        {
-            string termination = new string(_singleMoveBuffer.ToArray()).Trim();
-            foreach(var result in PgnReader.Results)
-            {
-                if(termination.EndsWith(result))
-                {
-                    _pgnMoves.Termination = result;
-                }
-            }
-            if(string.IsNullOrWhiteSpace(_pgnMoves.Termination))
-            {
-                if(_pgnMoves.Moves.Count > 0)
-                {
-
-                    termination = _pgnMoves.Moves[_pgnMoves.Moves.Count - 1].Move;
-
-                    foreach(var result in PgnReader.Results)
-                    {
-                        if(termination.EndsWith(result))
-                        {
-                            _pgnMoves.Moves.RemoveAt(_pgnMoves.Moves.Count - 1);
-                            _pgnMoves.Termination = result;
-                        }
-                    }
-                }
-            }
-
-            _pgnMoves.Termination = termination;
-            _pgnMoves.MoveSection = new string(_stateBuffer.ToArray());
-            game.AddMoves(_pgnMoves);
-        }
-
         public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
-            if(char.IsLetterOrDigit(current))
+            if(current == '1' && next == '/')
+            {
+                Terminate("1/2-1/2" + "", currentGame);
+
+                return PgnParseResult.EndOfGame;
+            }
+            else if(current == '1' && next == '-')
+            {
+                Terminate("1-2", currentGame);
+
+                return PgnParseResult.EndOfGame;
+            }
+            else if(current == '0' && next == '-')
+            {
+                Terminate("0-1", currentGame);
+
+                return PgnParseResult.EndOfGame;
+            }
+            else if(char.IsLetterOrDigit(current))
             {
                 if(!string.IsNullOrWhiteSpace(_currentMove.Move))
                 {
@@ -116,9 +85,33 @@ namespace CChessCore.Pgn
                 _singleMoveBuffer.Clear();
                 _stateBuffer.Add(current);
             }
+            else if(current == PgnToken.Asterisk.Token)
+            {
+                Terminate(current + "", currentGame);
+
+                return PgnParseResult.EndOfGame;
+            }
             else if (current == PgnToken.TagBegin.Token || current == '\0')
             {
-                TerminateGame(currentGame);
+                string gameResult = string.Empty;
+                string termination = new string(_singleMoveBuffer.ToArray()).Trim();
+                foreach(var result in PgnReader.Results)
+                {
+                    if(termination.EndsWith(result))
+                    {
+                        gameResult = result;
+                    }
+                }
+
+                if(string.IsNullOrEmpty(gameResult))
+                {
+                    Terminate("*", currentGame);
+                }
+                else
+                {
+                    Terminate(gameResult, currentGame);
+                }
+                
                 return PgnParseResult.EndOfGame;
             }
             else if (char.IsWhiteSpace(current))
@@ -141,6 +134,35 @@ namespace CChessCore.Pgn
             }
 
             return PgnParseResult.None;
+        }
+
+        private void Terminate(string termination, PgnGame currentGame)
+        {
+            var temp = new string(_singleMoveBuffer.ToArray()).Trim();
+            if(!string.IsNullOrWhiteSpace(temp))
+            {
+                _currentMove.Move = temp;
+            }
+
+            if(!string.IsNullOrWhiteSpace(_currentMove.Move))
+            {
+                _pgnMoves.AddMove(_currentMove);
+            }
+
+            _singleMoveBuffer.Clear();
+            _currentMove = new PgnMove();
+
+            _singleMoveBuffer.Clear();
+
+            _pgnMoves.Termination = termination;
+            _pgnMoves.MoveSection = new string(_stateBuffer.ToArray());
+            currentGame.AddMoves(_pgnMoves);
+        }
+
+        internal void InitGame(PgnGame game)
+        {
+            _pgnMoves.Clear();
+            _currentMove = new PgnMove();
         }
     }   
 }
