@@ -42,14 +42,7 @@ namespace CChessCore.Pgn
         private Char? _currentChar;
         private readonly IList<PgnGame> _games;
 
-        private PgnParserState _currentState;
-        private static PgnParserState _initState;
-        private static PgnParserState _restOfLineCommentState;
-        private static PgnParserState _textCommentState;
-        private static PgnParserState _tagSectionState;
-        private static PgnParserState _movesSectionState;
-        private static PgnParserState _recursiveVariationState;
-        private static PgnParserState _annotationState;
+        private PgnParserStatemachine _statemachine;
         #endregion
 
         /// <summary>
@@ -83,15 +76,7 @@ namespace CChessCore.Pgn
         ///   </exception>
         public PgnReader(TextReader reader, int bufferSize)
         {
-            _restOfLineCommentState = new RestOfLineCommentState(this);
-            _textCommentState = new TextCommentState(this);
-            _tagSectionState = new TagSectionState(this);
-            _movesSectionState = new MovesSectionState(this);
-            _initState = new InitState(this);
-            _recursiveVariationState = new RecursiveVariationState(this);
-            _annotationState = new AnnotationState(this);
-
-            _currentState = _initState;
+            _statemachine = new PgnParserStatemachine();
 
             BufferSize = bufferSize;
 
@@ -135,7 +120,7 @@ namespace CChessCore.Pgn
                 {
                     if(!TryReadNextBlock(fieldStartPosition, ref field))
                     {
-                        if (_currentState.Parse('\0', '\0', currentGame) == PgnParseResult.EndOfGame)
+                        if (_statemachine.Parse('\0', '\0', currentGame) == PgnParseResult.EndOfGame)
                         {
                             _games.Add(currentGame);
                             return currentGame;
@@ -154,7 +139,7 @@ namespace CChessCore.Pgn
                 _nextChar = _readerBuffer[_readerBufferPosition];
                 _readerBufferPosition++;
 
-                if(_currentState.Parse(_currentChar.Value, _nextChar, currentGame) == PgnParseResult.EndOfGame)
+                if(_statemachine.Parse(_currentChar.Value, _nextChar, currentGame) == PgnParseResult.EndOfGame)
                 {
                     _games.Add(currentGame);
                     _currentChar = _nextChar;
@@ -165,11 +150,6 @@ namespace CChessCore.Pgn
             }
 
             return null;
-        }
-
-        private void SetState(PgnParserState newState)
-        {
-            _currentState = newState;
         }
 
         private bool TryReadNextBlock(int fieldStartPosition, ref string field)

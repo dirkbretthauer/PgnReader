@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="InitState.cs" />
     <Compile Include="MovesSectionState.cs" />
+    <Compile Include="PgnParserStatemachine.cs" />
     <Compile Include="RecursiveVariationState.cs" />
     <Compile Include="AnnotationState.cs" />
     <Compile Include="TextCommentState.cs" />

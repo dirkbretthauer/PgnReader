@@ -28,46 +28,71 @@ using System.Collections.Generic;
 
 namespace CChessCore.Pgn
 {
-    public partial class PgnReader
+    internal abstract class PgnParserState
     {
-        protected abstract class PgnParserState
+        private IList<Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>> _transitions =
+            new List<Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>>();
+
+        protected readonly PgnParserStatemachine _statemachine;
+        
+        protected List<char> _stateBuffer;
+        protected PgnMove _currentMove;
+
+        protected PgnParserState(PgnParserStatemachine reader, int stateBufferSize = 256)
         {
-            protected readonly PgnReader _reader;
-            protected PgnParserState _previousState;
-            protected List<char> _stateBuffer;
-            protected PgnMove _currentMove;
+            _statemachine = reader;
+            _stateBuffer = new List<char>(stateBufferSize);
+        }
 
-            protected PgnParserState(PgnReader reader, int stateBufferSize = 256)
+        public abstract PgnParseResult Parse(char current, char next, PgnGame currentGame);
+            
+        public virtual void OnExit() { }
+
+        public virtual void OnEnter(PgnMove currentMove)
+        {
+            _currentMove = currentMove;
+            _stateBuffer.Clear();
+        }
+
+        public void AddTransition(Func<PgnParserState> next, Func<char, bool> condition)
+        {
+            _transitions.Add(new Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>(condition, next, null));
+        }
+
+        public void AddTransition(Func<PgnParserState> next, Func<char, bool> condition, Action<PgnGame> action)
+        {
+            _transitions.Add(new Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>(condition, next, action));
+        }
+
+        public bool TryTransite(char current, PgnGame game)
+        {
+            foreach(var item in _transitions)
             {
-                _reader = reader;
-                _stateBuffer = new List<char>(stateBufferSize);
+                if(item.Item1(current))
+                {
+                    ChangeState(item.Item2(), _currentMove);
+                    if(item.Item3 != null)
+                    {
+                        item.Item3(game);
+                    }
+                    return true;
+                }
             }
 
-            public abstract PgnParseResult Parse(char current, char next, PgnGame currentGame);
-            public virtual void OnExit() { }
-            public virtual void OnEnter(PgnMove currentMove)
-            {
-                _currentMove = currentMove;
-                _stateBuffer.Clear();
-            }
+            return false;
+        }
 
-            protected void ChangeState(PgnParserState oldState, PgnParserState newState, PgnMove currentMove = null)
-            {
-                this.OnExit();
-                _reader.SetState(newState);
-                newState._previousState = oldState;
-                newState.OnEnter(currentMove);
-            }
+        public void ChangeState(PgnParserState newState, PgnMove currentMove = null)
+        {
+            OnExit();
+            _statemachine.SetState(newState);
+            
+            newState.OnEnter(currentMove);
+        }
 
-            protected void GoToPreviousState(PgnMove move)
-            {
-                ChangeState(this, _previousState, move);
-            }
-
-            internal string GetStateBuffer()
-            {
-                return new string(_stateBuffer.ToArray());
-            }
+        internal string GetStateBuffer()
+        {
+            return new string(_stateBuffer.ToArray());
         }
     }
 }
