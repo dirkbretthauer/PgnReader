@@ -36,6 +36,11 @@ namespace CChessCore.Pgn
             _singleMoveBuffer = new List<char>(255);
         }
 
+        public override void OnEnter(PgnMove currentMove)
+        {
+            _currentMove = currentMove;
+        }
+
         public override void OnExit()
         {
             var temp = GetStateBuffer().Trim();
@@ -159,6 +164,8 @@ namespace CChessCore.Pgn
 
         internal void InitGame(PgnGame game)
         {
+            _stateBuffer.Clear();
+            _singleMoveBuffer.Clear();
             _currentMove = new PgnMove();
         }
     }   
