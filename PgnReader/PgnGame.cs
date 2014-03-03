@@ -37,14 +37,15 @@ namespace CChessCore.Pgn
             get { return _tagList.Count > 0; }
         }
 
-        public PgnMoves Moves { get { return _moves; } }
+        public IList<PgnMove> Moves { get { return _moves; } }
 
         private readonly IList<PgnTag> _tagList;
-        private PgnMoves _moves;
+        private IList<PgnMove> _moves;
 
         public PgnGame()
         {
-            _tagList = new List<PgnTag>();    
+            _tagList = new List<PgnTag>();
+            _moves = new List<PgnMove>();
         }
 
         public void AddTag(PgnTag tag)
@@ -56,9 +57,17 @@ namespace CChessCore.Pgn
             }
         }
 
-        public void AddMoves(PgnMoves moves)
+        public void AddMove(PgnMove _currentMove)
         {
-            _moves = moves;
+            _moves.Add(_currentMove);
+        }
+
+        public void AddMoves(IEnumerable<PgnMove> moves)
+        {
+            foreach(var move in moves)
+            {
+                _moves.Add(move);
+            }
         }
 
         public bool TryGetTag(string name, out PgnTag tag)
@@ -69,5 +78,9 @@ namespace CChessCore.Pgn
 
             return true;
         }
+
+        public string Termination { get; set; }
+
+        public string MoveSection { get; set; }
     }
 }

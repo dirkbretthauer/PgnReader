@@ -126,11 +126,11 @@ namespace PgnReaderTest
             Assert.IsNotNull(tag);
             Assert.AreEqual("0-1", tag.Value);
 
-            Assert.AreEqual(26 * 2, _pgnReader.CurrentGame.Moves.Moves.Count);
+            Assert.AreEqual(26 * 2, _pgnReader.CurrentGame.Moves.Count);
 
-            Assert.AreEqual("b4", _pgnReader.CurrentGame.Moves.Moves[0].Move);
-            Assert.AreEqual("Nxc5", _pgnReader.CurrentGame.Moves.Moves[32].Move);
-            Assert.AreEqual("Qb3#", _pgnReader.CurrentGame.Moves.Moves[51].Move);
+            Assert.AreEqual("b4", _pgnReader.CurrentGame.Moves[0].Move);
+            Assert.AreEqual("Nxc5", _pgnReader.CurrentGame.Moves[32].Move);
+            Assert.AreEqual("Qb3#", _pgnReader.CurrentGame.Moves[51].Move);
         }
 
         [TestMethod]
@@ -164,11 +164,11 @@ namespace PgnReaderTest
             Assert.IsNotNull(tag);
             Assert.AreEqual("1-0", tag.Value);
 
-            Assert.AreEqual(101, _pgnReader.CurrentGame.Moves.Moves.Count);
+            Assert.AreEqual(101, _pgnReader.CurrentGame.Moves.Count);
 
-            Assert.AreEqual("c4", _pgnReader.CurrentGame.Moves.Moves[0].Move);
-            Assert.AreEqual("Nxg7+", _pgnReader.CurrentGame.Moves.Moves[74].Move);
-            Assert.AreEqual("h5", _pgnReader.CurrentGame.Moves.Moves[100].Move);
+            Assert.AreEqual("c4", _pgnReader.CurrentGame.Moves[0].Move);
+            Assert.AreEqual("Nxg7+", _pgnReader.CurrentGame.Moves[74].Move);
+            Assert.AreEqual("h5", _pgnReader.CurrentGame.Moves[100].Move);
         }
     }
 }

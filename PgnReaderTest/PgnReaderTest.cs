@@ -148,11 +148,11 @@ namespace PgnReaderTest
         {
             _pgnReader.ReadGame();
 
-            Assert.AreEqual(46 * 2, _pgnReader.CurrentGame.Moves.Moves.Count);
+            Assert.AreEqual(46 * 2, _pgnReader.CurrentGame.Moves.Count);
 
-            Assert.AreEqual("e4", _pgnReader.CurrentGame.Moves.Moves[0].Move);
-            Assert.AreEqual("Bf4", _pgnReader.CurrentGame.Moves.Moves[34].Move);
-            Assert.AreEqual("fxe3", _pgnReader.CurrentGame.Moves.Moves[91].Move);
+            Assert.AreEqual("e4", _pgnReader.CurrentGame.Moves[0].Move);
+            Assert.AreEqual("Bf4", _pgnReader.CurrentGame.Moves[34].Move);
+            Assert.AreEqual("fxe3", _pgnReader.CurrentGame.Moves[91].Move);
         }
     }
 }

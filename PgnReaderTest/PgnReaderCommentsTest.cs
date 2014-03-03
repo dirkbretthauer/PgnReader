@@ -167,9 +167,9 @@ namespace PgnReaderTest
         {
             _pgnReader.ReadGame();
 
-            Assert.AreEqual("Some comment here", _pgnReader.CurrentGame.Moves.Moves[5].Comment);
-            Assert.AreEqual("One more comment", _pgnReader.CurrentGame.Moves.Moves[48].Comment);
-            Assert.AreEqual("This is an eol comment", _pgnReader.CurrentGame.Moves.Moves[78].Comment);
+            Assert.AreEqual("Some comment here", _pgnReader.CurrentGame.Moves[5].Comment);
+            Assert.AreEqual("One more comment", _pgnReader.CurrentGame.Moves[48].Comment);
+            Assert.AreEqual("This is an eol comment", _pgnReader.CurrentGame.Moves[78].Comment);
         }
 
         [TestMethod]
@@ -177,11 +177,11 @@ namespace PgnReaderTest
         {
             _pgnReader.ReadGame();
 
-            Assert.AreEqual(46 * 2, _pgnReader.CurrentGame.Moves.Moves.Count);
+            Assert.AreEqual(46 * 2, _pgnReader.CurrentGame.Moves.Count);
 
-            Assert.AreEqual("e4", _pgnReader.CurrentGame.Moves.Moves[0].Move);
-            Assert.AreEqual("Bf4", _pgnReader.CurrentGame.Moves.Moves[34].Move);
-            Assert.AreEqual("fxe3", _pgnReader.CurrentGame.Moves.Moves[91].Move);
+            Assert.AreEqual("e4", _pgnReader.CurrentGame.Moves[0].Move);
+            Assert.AreEqual("Bf4", _pgnReader.CurrentGame.Moves[34].Move);
+            Assert.AreEqual("fxe3", _pgnReader.CurrentGame.Moves[91].Move);
         }
 
         [TestMethod]
@@ -190,9 +190,9 @@ namespace PgnReaderTest
             _pgnReader.ReadGame();
             _pgnReader.ReadGame();
 
-            Assert.AreEqual(@"3...Bb4 { The Winawer Variation is probably best, though not as easy to play. }", _pgnReader.CurrentGame.Moves.Moves[5].Comment);
-            Assert.AreEqual("18...h4 19. Qg4 Rh5", _pgnReader.CurrentGame.Moves.Moves[48].Comment);
-            Assert.AreEqual("This is an eol comment", _pgnReader.CurrentGame.Moves.Moves[78].Comment);
+            Assert.AreEqual(@"3...Bb4 { The Winawer Variation is probably best, though not as easy to play. }", _pgnReader.CurrentGame.Moves[5].Comment);
+            Assert.AreEqual("18...h4 19. Qg4 Rh5", _pgnReader.CurrentGame.Moves[48].Comment);
+            Assert.AreEqual("This is an eol comment", _pgnReader.CurrentGame.Moves[78].Comment);
         }
     }
 }

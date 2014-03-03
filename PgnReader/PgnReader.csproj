@@ -44,7 +44,6 @@
     <Compile Include="TextCommentState.cs" />
     <Compile Include="PgnGame.cs" />
     <Compile Include="PgnMove.cs" />
-    <Compile Include="PgnMoves.cs" />
     <Compile Include="PgnParseResult.cs" />
     <Compile Include="PgnParserState.cs" />
     <Compile Include="PgnReader.cs" />

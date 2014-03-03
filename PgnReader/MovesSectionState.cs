@@ -29,7 +29,6 @@ namespace CChessCore.Pgn
     internal class MovesSectionState : PgnParserState
     {
         protected List<char> _singleMoveBuffer;
-        private PgnMoves _pgnMoves = new PgnMoves();
 
         public MovesSectionState(PgnParserStatemachine reader)
             : base(reader, 1024)
@@ -70,7 +69,7 @@ namespace CChessCore.Pgn
             {
                 if(!string.IsNullOrWhiteSpace(_currentMove.Move))
                 {
-                    _pgnMoves.AddMove(_currentMove);
+                    currentGame.AddMove(_currentMove);
                     _singleMoveBuffer.Clear();
 
                     _currentMove = new PgnMove();
@@ -146,7 +145,7 @@ namespace CChessCore.Pgn
 
             if(!string.IsNullOrWhiteSpace(_currentMove.Move))
             {
-                _pgnMoves.AddMove(_currentMove);
+                currentGame.AddMove(_currentMove);
             }
 
             _singleMoveBuffer.Clear();
@@ -154,14 +153,12 @@ namespace CChessCore.Pgn
 
             _singleMoveBuffer.Clear();
 
-            _pgnMoves.Termination = termination;
-            _pgnMoves.MoveSection = new string(_stateBuffer.ToArray());
-            currentGame.AddMoves(_pgnMoves);
+            currentGame.Termination = termination;
+            currentGame.MoveSection = new string(_stateBuffer.ToArray());
         }
 
         internal void InitGame(PgnGame game)
         {
-            _pgnMoves.Clear();
             _currentMove = new PgnMove();
         }
     }   
