@@ -43,7 +43,7 @@ namespace CChessCore.Pgn
 
         public override void OnExit()
         {
-            var temp = GetStateBuffer().Trim();
+            var temp = new string(_singleMoveBuffer.ToArray()).Trim();
             if(!string.IsNullOrWhiteSpace(temp))
             {
                 _currentMove.Move = temp;
@@ -153,18 +153,18 @@ namespace CChessCore.Pgn
                 currentGame.AddMove(_currentMove);
             }
 
-            _singleMoveBuffer.Clear();
-            _currentMove = new PgnMove();
-
-            _singleMoveBuffer.Clear();
-
             currentGame.Termination = termination;
             currentGame.MoveSection = new string(_stateBuffer.ToArray());
+
+            _singleMoveBuffer.Clear();
+            _stateBuffer.Clear();
+            _currentMove = new PgnMove();
         }
 
         internal void InitGame(PgnGame game)
         {
             _stateBuffer.Clear();
+            _stateBuffer.Add('1');
             _singleMoveBuffer.Clear();
             _currentMove = new PgnMove();
         }
