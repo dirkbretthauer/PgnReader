@@ -91,7 +91,7 @@ namespace CChessCore.Pgn
             {
                 if(halfmoveCounter % 2 == 1)
                 {
-                    sb.Append(moveCounter).Append('.');
+                    sb.Append(moveCounter).Append(". ");
                 }
                 else
                 {
@@ -112,6 +112,8 @@ namespace CChessCore.Pgn
 
                 halfmoveCounter++;
             }
+
+            sb.Append(Termination);
 
             return sb.ToString();
         }
