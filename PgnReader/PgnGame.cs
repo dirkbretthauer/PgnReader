@@ -27,6 +27,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace CChessCore.Pgn
 {
@@ -38,6 +39,8 @@ namespace CChessCore.Pgn
         }
 
         public IList<PgnMove> Moves { get { return _moves; } }
+
+        public string Termination { get; set; }
 
         private readonly IList<PgnTag> _tagList;
         private IList<PgnMove> _moves;
@@ -79,8 +82,38 @@ namespace CChessCore.Pgn
             return true;
         }
 
-        public string Termination { get; set; }
+        public string GetMovesAsPgn()
+        {
+            StringBuilder sb = new StringBuilder();
+            int moveCounter = 1;
+            int halfmoveCounter = 1;
+            foreach(var move in _moves)
+            {
+                if(halfmoveCounter % 2 == 1)
+                {
+                    sb.Append(moveCounter).Append('.');
+                }
+                else
+                {
+                    moveCounter++;
+                }
 
-        public string MoveSection { get; set; }
+                sb.Append(move.Move);
+                
+                if(!string.IsNullOrWhiteSpace(move.Annotation))
+                    sb.Append(move.Annotation);
+                sb.Append(' ');
+
+                if(!string.IsNullOrWhiteSpace(move.Comment))
+                    sb.Append(PgnToken.TextCommentBegin.Token).Append(move.Comment).Append(PgnToken.TextCommentEnd.Token).Append(' ');
+
+                if(!string.IsNullOrWhiteSpace(move.Variation))
+                    sb.Append(PgnToken.RecursiveVariationBegin.Token).Append(move.Variation).Append(PgnToken.RecursiveVariationEnd.Token).Append(' ');
+
+                halfmoveCounter++;
+            }
+
+            return sb.ToString();
+        }
     }
 }

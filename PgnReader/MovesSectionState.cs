@@ -159,12 +159,12 @@ namespace CChessCore.Pgn
             _singleMoveBuffer.Clear();
 
             currentGame.Termination = termination;
-            currentGame.MoveSection = new string(_stateBuffer.ToArray());
         }
 
         internal void InitGame(PgnGame game)
         {
             _stateBuffer.Clear();
+            _stateBuffer.Add('1');
             _singleMoveBuffer.Clear();
             _currentMove = new PgnMove();
         }
