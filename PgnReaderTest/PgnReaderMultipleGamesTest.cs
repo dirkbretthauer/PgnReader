@@ -77,7 +77,39 @@ namespace PgnReaderTest
             28. Bxa5 Rxb1 29. Rxb1 Rxf5 30. f4 Rxa5 31. fxg5 Be6 32. Rc1 Rf5+ 33. Ke1 Rxg5
             34. Nf4 Bg4 35. Bd5+ Kf8 36. h4 Rf5 37. Ne6+ Kf7 38. Nxg7+ Kxg7 39. Be6 Kf6 40.
             Bxf5 Kxf5 41. c5 Ke4 42. c6 Kd5 43. Kd2 Bc8 44. Ke3 e5 45. dxe5 dxe5 46. c7 Kd6
-            47. Rd1+ Kxc7 48. Ke4 Bg4 49. Rd2 Kc6 50. Kxe5 Bf5 51. h5 1-0";
+            47. Rd1+ Kxc7 48. Ke4 Bg4 49. Rd2 Kc6 50. Kxe5 Bf5 51. h5 1-0
+
+            [Event ""SC Garching 1980 e.V. 2-Muenchener SC 1836 e.V. 1""]
+            [Date ""2014.04.06""]
+            [Round ""9.1""]
+            [Board ""1""]
+            [White ""Pezerovic, Edin""]
+            [Black ""Schleich, Markus""]
+            [Result ""1/2-1/2""]
+            [WhiteElo ""2358""]
+            [BlackElo ""2228""]
+            [WhiteTeam ""Münchener SC 1836 e.V. 1""]
+            [BlackTeam ""SC Garching 1980 e.V. 2""]
+            [PlyCount  ""24""]
+ 
+            1.d4 Nf6 2.Bg5 Ne4 3.Bf4 d5 4.Nf3 c5 5.c3 Nc6 6.e3 Qb6 7.Qc1 Bf5 8.Nbd2 e6 9.Be2 Be7 10.Nxe4 Bxe4 11.Qd2 O-O 12.O-O Rac8  
+ 
+ 
+            [Event ""SC Garching 1980 e.V. 2-Muenchener SC 1836 e.V. 1""]
+            [Date ""2014.04.06""]
+            [Round ""9.2""]
+            [Board ""2""]
+            [White ""Dehlinger, Alexander""]
+            [Black ""Hantak, Adam""]
+            [Result ""1-0""]
+            [WhiteElo ""2228""]
+            [BlackElo ""2166""]
+            [WhiteTeam ""SC Garching 1980 e.V. 2""]
+            [BlackTeam ""Münchener SC 1836 e.V. 1""]
+            [PlyCount  ""89""]
+ 
+            1.Nf3 Nf6 2.c4 g6 3.g3 Bg7 4.Bg2 O-O 5.O-O d6 6.d4 Nc6 7.Nc3 Bg4 8.Be3 Nd7 9.Qd2 Re8 10.Rfd1 e5 11.dxe5 Ndxe5 12.Nxe5 Nxe5 13.b3 Qc8 14.Rac1 Bh3 15.Qd5 Nc6 16.Bxh3 Qxh3 17.Qg2 Qxg2+ 18.Kxg2 Bxc3 19.Rxc3 a5 20.c5 dxc5 21.Rd7 b6 22.Rxc7 Rac8 23.Rxc8 Rxc8 24.Rd3 Rd8 25.Rxd8+ Nxd8 26.Kf3 Kf8 27.Ke4 Ke7 28.Kd5 Kd7 29.Bd2 Ne6 30.Bc3 Nc7+ 31.Ke5 f6+ 32.Ke4 Ke6 33.Kd3 Nb5 34.Bb2 f5 35.f3 Kd5 36.e4+ fxe4+ 37.fxe4+ Kc6 38.Be5 Nd6 39.Bxd6 Kxd6 40.Kc4 Ke5 41.Kb5 Kxe4 42.Kxb6 Kf3 43.Kxa5 Kg2 44.Kb5 Kxh2 45.a4  
+             ";
 
         private PgnReader _pgnReader;
 
@@ -169,6 +201,33 @@ namespace PgnReaderTest
             Assert.AreEqual("c4", _pgnReader.CurrentGame.Moves[0].Move);
             Assert.AreEqual("Nxg7+", _pgnReader.CurrentGame.Moves[74].Move);
             Assert.AreEqual("h5", _pgnReader.CurrentGame.Moves[100].Move);
+        }
+
+        [TestMethod]
+        public void ThirdGameTest()
+        {
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+
+            PgnTag result;
+            _pgnReader.CurrentGame.TryGetTag("Result", out result);
+            Assert.AreEqual("1/2-1/2", result.Value);
+            Assert.AreEqual(23, _pgnReader.CurrentGame.Moves.Count);
+        }
+
+        [TestMethod]
+        public void FourthGameTest()
+        {
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+
+            PgnTag result;
+            _pgnReader.CurrentGame.TryGetTag("Result", out result);
+            Assert.AreEqual("1-0", result.Value);
+            Assert.AreEqual(89, _pgnReader.CurrentGame.Moves.Count);
         }
     }
 }

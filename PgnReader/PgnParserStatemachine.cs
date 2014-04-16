@@ -33,6 +33,7 @@ namespace CChessCore.Pgn
     public class PgnParserStatemachine
     {
         #region fields
+        private readonly PgnReader _reader;
         private PgnParserState _currentState;
         private PgnParserState _previousState;
         private static PgnParserState _initState;
@@ -46,12 +47,12 @@ namespace CChessCore.Pgn
 
 
         #region properties
-        public  static IEnumerable<string> Results = new string[] { "1-0", "0-1", "1/2-1/2", "*" };        
+        public static IEnumerable<string> Results = new string[] { "1-0", "0-1", "1/2-1/2", "*" };        
         #endregion
 
-        public PgnParserStatemachine()
+        public PgnParserStatemachine(PgnReader reader)
         {
-
+            _reader = reader;
             _restOfLineCommentState = new RestOfLineCommentState(this);
             _textCommentState = new TextCommentState(this);
             _tagSectionState = new TagSectionState(this);
@@ -99,11 +100,6 @@ namespace CChessCore.Pgn
 
         internal PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
-            if(_currentState.TryTransite(current, currentGame))
-            {
-                return PgnParseResult.None;
-            }
-            
             var result = _currentState.Parse(current, next, currentGame);
             if(result == PgnParseResult.EndOfGame)
             {
@@ -111,6 +107,11 @@ namespace CChessCore.Pgn
             }
 
             return result;
+        }
+
+        internal void SkipNextChars(int count)
+        {
+            _reader.SkipNextChars(count);
         }
     }
 }

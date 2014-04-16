@@ -44,7 +44,17 @@ namespace CChessCore.Pgn
             _stateBuffer = new List<char>(stateBufferSize);
         }
 
-        public abstract PgnParseResult Parse(char current, char next, PgnGame currentGame);
+        protected abstract PgnParseResult DoParse(char current, char next, PgnGame currentGame);
+
+        public virtual PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        {
+            if(TryTransite(current, currentGame))
+            {
+                return PgnParseResult.None;
+            }
+
+            return DoParse(current, next, currentGame);
+        }
             
         public virtual void OnExit() { }
 
@@ -64,7 +74,7 @@ namespace CChessCore.Pgn
             _transitions.Add(new Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>(condition, next, action));
         }
 
-        public bool TryTransite(char current, PgnGame game)
+        protected bool TryTransite(char current, PgnGame game)
         {
             foreach(var item in _transitions)
             {

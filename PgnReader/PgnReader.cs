@@ -76,7 +76,7 @@ namespace CChessCore.Pgn
         ///   </exception>
         public PgnReader(TextReader reader, int bufferSize)
         {
-            _statemachine = new PgnParserStatemachine();
+            _statemachine = new PgnParserStatemachine(this);
 
             BufferSize = bufferSize;
 
@@ -217,5 +217,16 @@ namespace CChessCore.Pgn
             }
         }
         #endregion
+
+        internal void SkipNextChars(int count)
+        {
+            for(int i = 0; i < count; i++)
+            {
+                _nextChar = _readerBuffer[_readerBufferPosition];
+                _readerBufferPosition++;
+
+                _currentChar = _nextChar;
+            }
+        }
     }
 }

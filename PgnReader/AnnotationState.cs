@@ -37,7 +37,7 @@ namespace CChessCore.Pgn
             _currentMove.Annotation = GetStateBuffer().Trim();
         }
 
-        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
         {
             _stateBuffer.Add(current);
                 

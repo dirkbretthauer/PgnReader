@@ -47,7 +47,7 @@ namespace CChessCore.Pgn
             _current.AddTag(PgnTag.Parse(new string(_stateBuffer.ToArray())));
         }
 
-        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
         {
             _current = currentGame;
             _stateBuffer.Add(current);

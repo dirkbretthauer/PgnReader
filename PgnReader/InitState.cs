@@ -32,7 +32,7 @@ namespace CChessCore.Pgn
         {
         }
 
-        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
         {
             return PgnParseResult.None;
         }

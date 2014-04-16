@@ -38,7 +38,7 @@ namespace CChessCore.Pgn
             _currentMove.Comment = GetStateBuffer().Trim();
         }
 
-        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
         {
             if (char.IsWhiteSpace(current) && char.IsWhiteSpace(next))
             {

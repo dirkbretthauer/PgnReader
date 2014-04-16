@@ -50,23 +50,29 @@ namespace CChessCore.Pgn
             }
         }
 
-        public override PgnParseResult Parse(char current, char next, PgnGame currentGame)
+        protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
         {
             if(current == '1' && next == '/')
             {
                 Terminate("1/2-1/2" + "", currentGame);
 
+                _statemachine.SkipNextChars(6);
+
                 return PgnParseResult.EndOfGame;
             }
             else if(current == '1' && next == '-')
             {
-                Terminate("1-2", currentGame);
+                Terminate("1-0", currentGame);
+
+                _statemachine.SkipNextChars(2);
 
                 return PgnParseResult.EndOfGame;
             }
             else if(current == '0' && next == '-')
             {
                 Terminate("0-1", currentGame);
+
+                _statemachine.SkipNextChars(2);
 
                 return PgnParseResult.EndOfGame;
             }
@@ -125,6 +131,11 @@ namespace CChessCore.Pgn
                 if(!string.IsNullOrWhiteSpace(temp))
                 {
                     _currentMove.Move = temp;
+                }
+                
+                if(next == PgnToken.TagBegin.Token)
+                {
+                    return PgnParseResult.EndOfGame;
                 }
             }
             else if (current == '\r')
