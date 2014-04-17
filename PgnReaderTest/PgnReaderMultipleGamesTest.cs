@@ -214,6 +214,8 @@ namespace PgnReaderTest
             _pgnReader.CurrentGame.TryGetTag("Result", out result);
             Assert.AreEqual("1/2-1/2", result.Value);
             Assert.AreEqual(23, _pgnReader.CurrentGame.Moves.Count);
+
+            Assert.IsFalse(_pgnReader.CurrentGame.Moves.Contains(null));
         }
 
         [TestMethod]

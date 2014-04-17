@@ -192,7 +192,7 @@ namespace PgnReaderTest
 
             Assert.AreEqual(@"3...Bb4 { The Winawer Variation is probably best, though not as easy to play. }", _pgnReader.CurrentGame.Moves[5].Comment);
             Assert.AreEqual("18...h4 19. Qg4 Rh5", _pgnReader.CurrentGame.Moves[48].Comment);
-            Assert.AreEqual("This is an eol comment", _pgnReader.CurrentGame.Moves[78].Comment);
+            Assert.AreEqual("This is an eol comment", _pgnReader.CurrentGame.Moves[55].Move);
         }
     }
 }
