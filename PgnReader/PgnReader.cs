@@ -108,8 +108,6 @@ namespace CChessCore.Pgn
         private PgnGame InternalReadGame()
         {
             var currentGame = new PgnGame();
-            string field = null;
-            var fieldStartPosition = _readerBufferPosition;
             var currentCharPos = 0;
             
             while (true)
@@ -118,16 +116,16 @@ namespace CChessCore.Pgn
 
                 if (_readerBufferPosition == _charsRead)
                 {
-                    if(!TryReadNextBlock(fieldStartPosition, ref field))
+                    if(!TryReadNextBlock())
                     {
-                        if (_statemachine.Parse('\0', '\0', currentGame) == PgnParseResult.EndOfGame)
-                        {
-                            _games.Add(currentGame);
-                            return currentGame;
-                        }
-                        break;
+                        _statemachine.Parse('\0', '\0', currentGame);
+                        
+                        if(currentGame.Moves.Count == 0)
+                            return null;
+
+                        _games.Add(currentGame);
+                        return currentGame;
                     }
-                    fieldStartPosition = 0;
                 }
 
                 if(_currentChar == null)
@@ -148,20 +146,10 @@ namespace CChessCore.Pgn
 
                 _currentChar = _nextChar;
             }
-
-            return null;
         }
 
-        private bool TryReadNextBlock(int fieldStartPosition, ref string field)
+        private bool TryReadNextBlock()
         {
-            if (fieldStartPosition != _readerBufferPosition)
-            {
-                // The buffer ran out. Take the current
-                // text and add it to the field.
-                field += new string(_readerBuffer, fieldStartPosition,
-                                    _readerBufferPosition - fieldStartPosition);
-            }
-
             _charsRead = _reader.Read(_readerBuffer, 0, _readerBuffer.Length);
             _readerBufferPosition = 0;
 
@@ -172,6 +160,21 @@ namespace CChessCore.Pgn
             }
 
             return true;
+        }
+
+        internal void SkipNextChars(int count)
+        {
+            for(int i = 0; i < count; i++)
+            {
+                if(_readerBufferPosition == _charsRead)
+                {
+                    if(!TryReadNextBlock())
+                        return;
+                }
+                _currentChar = _nextChar;
+                _nextChar = _readerBuffer[_readerBufferPosition];
+                _readerBufferPosition++;
+            }
         }
 
         #region IDisposable Members
@@ -217,16 +220,5 @@ namespace CChessCore.Pgn
             }
         }
         #endregion
-
-        internal void SkipNextChars(int count)
-        {
-            for(int i = 0; i < count; i++)
-            {
-                _nextChar = _readerBuffer[_readerBufferPosition];
-                _readerBufferPosition++;
-
-                _currentChar = _nextChar;
-            }
-        }
     }
 }
