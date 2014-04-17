@@ -27,6 +27,7 @@ namespace CChessCore.Pgn
 {
     internal class RecursiveVariationState : PgnParserState
     {
+        public bool VariationContainsOpeningBrace { get; private set; }
 
         public RecursiveVariationState(PgnParserStatemachine reader)
             : base(reader)
@@ -51,6 +52,16 @@ namespace CChessCore.Pgn
             else if(current == '\r')
             {
                 //remove linebreaks
+            }
+            else if(current == PgnToken.RecursiveVariationBegin.Token)
+            {
+                VariationContainsOpeningBrace = true;
+                _stateBuffer.Add(current);
+            }
+            else if(current == PgnToken.RecursiveVariationEnd.Token)
+            {
+                VariationContainsOpeningBrace = false;
+                _stateBuffer.Add(current);
             }
             else
             {

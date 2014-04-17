@@ -38,10 +38,10 @@ namespace CChessCore.Pgn
         private PgnParserState _previousState;
         private static PgnParserState _initState;
         private static PgnParserState _restOfLineCommentState;
-        private static PgnParserState _textCommentState;
+        private static TextCommentState _textCommentState;
         private static PgnParserState _tagSectionState;
         private static MovesSectionState _movesSectionState;
-        private static PgnParserState _recursiveVariationState;
+        private static RecursiveVariationState _recursiveVariationState;
         private static PgnParserState _annotationState;
         #endregion
 
@@ -68,11 +68,11 @@ namespace CChessCore.Pgn
 
             _annotationState.AddTransition(GetPreviousState, c => c == ' ');
 
-            _recursiveVariationState.AddTransition(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token);
+            _recursiveVariationState.AddTransition(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token && !_recursiveVariationState.VariationContainsOpeningBrace);
 
             _restOfLineCommentState.AddTransition(GetPreviousState, c => c == '\n');
 
-            _textCommentState.AddTransition(GetPreviousState, c => c == PgnToken.TextCommentEnd.Token);
+            _textCommentState.AddTransition(GetPreviousState, c => c == PgnToken.TextCommentEnd.Token && !_textCommentState.CommentContainsOpeningBrace);
 
             _tagSectionState.AddTransition(() => _initState, c => c == PgnToken.TagEnd.Token);
             _tagSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);

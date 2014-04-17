@@ -191,8 +191,9 @@ namespace PgnReaderTest
             _pgnReader.ReadGame();
 
             Assert.AreEqual(@"3...Bb4 { The Winawer Variation is probably best, though not as easy to play. }", _pgnReader.CurrentGame.Moves[5].Comment);
-            Assert.AreEqual("18...h4 19. Qg4 Rh5", _pgnReader.CurrentGame.Moves[48].Comment);
-            Assert.AreEqual("This is an eol comment", _pgnReader.CurrentGame.Moves[55].Move);
+            Assert.AreEqual(@"24...Rc7 { Mark and Fritz7 agree! }", _pgnReader.CurrentGame.Moves[47].Comment);
+            Assert.AreEqual(@"2", _pgnReader.CurrentGame.Moves[47].Annotation);
+            Assert.AreEqual("Black created the weakness (Pa5) and can't quite defend it, so Anand forces a draw.", _pgnReader.CurrentGame.Moves[54].Comment);
         }
     }
 }
