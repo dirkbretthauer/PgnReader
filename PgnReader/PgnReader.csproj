@@ -38,6 +38,7 @@
   <ItemGroup>
     <Compile Include="InitState.cs" />
     <Compile Include="MovesSectionState.cs" />
+    <Compile Include="PgnVariation.cs" />
     <Compile Include="PgnParserStatemachine.cs" />
     <Compile Include="RecursiveVariationState.cs" />
     <Compile Include="AnnotationState.cs" />
@@ -51,7 +52,6 @@
     <Compile Include="PgnTag.cs" />
     <Compile Include="PgnToken.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RestOfLineCommentState.cs" />
     <Compile Include="TagSectionState.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

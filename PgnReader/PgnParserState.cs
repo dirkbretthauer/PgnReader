@@ -38,9 +38,9 @@ namespace CChessCore.Pgn
         protected List<char> _stateBuffer;
         protected PgnMove _currentMove;
 
-        protected PgnParserState(PgnParserStatemachine reader, int stateBufferSize = 256)
+        protected PgnParserState(PgnParserStatemachine statemachine, int stateBufferSize = 255)
         {
-            _statemachine = reader;
+            _statemachine = statemachine;
             _stateBuffer = new List<char>(stateBufferSize);
         }
 

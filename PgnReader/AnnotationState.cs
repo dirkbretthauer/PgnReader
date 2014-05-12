@@ -23,10 +23,24 @@
 ///////////////////////////////////////////////////////////////////////////////
 #endregion
 
+using System.Collections.Generic;
 namespace CChessCore.Pgn
 {
     internal class AnnotationState : PgnParserState
     {
+        private static Dictionary<string, string> _nags = new Dictionary<string, string>()
+            {
+                {"0", string.Empty},
+                {"1", "!"},
+                {"2", "?"},
+                {"3", "!!"},
+                {"4", "??"},
+                {"5", "!?"},
+                {"6", "?!"},
+                {"7", "(forced move)"},
+                {"8", "(singular move)"},
+                {"9", "(worst move)"},
+            };
         public AnnotationState(PgnParserStatemachine reader)
             : base(reader)
         {
@@ -34,7 +48,15 @@ namespace CChessCore.Pgn
 
         public override void OnExit()
         {
-            _currentMove.Annotation = GetStateBuffer().Trim();
+            var key = GetStateBuffer().Trim();
+            if(_nags.ContainsKey(key))
+            {
+                _currentMove.Annotation = _nags[key];
+            }
+            else
+            {
+                _currentMove.Annotation = PgnToken.NumericAnnotationGlyph + key;
+            }
         }
 
         protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)

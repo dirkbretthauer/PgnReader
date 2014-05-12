@@ -57,7 +57,7 @@ namespace CChessCore.Pgn
             {
                 end = 1;
             }
-            var inner = field.Substring(start, field.Length - start - end);
+            var inner = field.Substring(start, field.Length - start - end).Trim();
 
             var tagNameLength = inner.IndexOf(' ');
             if (tagNameLength < 0)

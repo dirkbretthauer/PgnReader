@@ -50,8 +50,13 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="RecursiveVariationStateTest.cs" />
     <Compile Include="PgnReaderMultipleGamesTest.cs" />
     <Compile Include="PgnReaderCommentsTest.cs" />
+    <Compile Include="AnnotationStateTest.cs" />
+    <Compile Include="TagSectionStateTest.cs" />
+    <Compile Include="MovesSectionStateTest.cs" />
+    <Compile Include="TextCommentStateTest.cs" />
     <Compile Include="PgnReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

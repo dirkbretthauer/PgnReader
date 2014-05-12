@@ -23,53 +23,72 @@
 ///////////////////////////////////////////////////////////////////////////////
 #endregion
 
-using System.Collections.Generic;
-using System.Linq;
+using System;
+using System.IO;
+using CChessCore.Pgn;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CChessCore.Pgn
+namespace PgnReaderTest
 {
-    public class PgnMove
+    [TestClass]
+    public class AnnotationStateTest
     {
-        public string Move { get; set; }
 
-        public string Comment { get; set; }
+        private AnnotationState _state;
 
-        public IList<PgnVariation> Variation { get; set; }
-
-        public string Annotation { get; set; }
-
-        public bool IsValid { get { return !string.IsNullOrEmpty(Move); } }
-
-        public PgnMove() :
-            this(string.Empty)
+        [TestInitialize]
+        public void TestInitialize()
         {
-
+            _state = new AnnotationState(null);
         }
 
-        public PgnMove(string move) :
-            this(move, string.Empty)
+        [TestCleanup]
+        public void TestCleanup()
         {
+            _state = null;
+        }
+
+        [TestMethod]
+        public void GoodMoveNagTest()
+        {
+            var game = new PgnGame();
+            var move = new PgnMove();
+            _state.OnEnter(move);
+
+            _state.Parse('1', ' ', game);
+
+            _state.OnExit();
             
+            Assert.AreEqual("!", move.Annotation);
         }
 
-        public PgnMove(string move, string comment) :
-            this(string.Empty, string.Empty, string.Empty)
+        [TestMethod]
+        public void WorstMoveNagTest()
         {
+            var game = new PgnGame();
+            var move = new PgnMove();
+            _state.OnEnter(move);
 
+            _state.Parse('9', ' ', game);
+
+            _state.OnExit();
+
+            Assert.AreEqual("(worst move)", move.Annotation);
         }
 
-        public PgnMove(string move, string comment, string variation) :
-            this(string.Empty, string.Empty, new PgnVariation(), string.Empty)
+        [TestMethod]
+        public void UnknownNagTest()
         {
+            var game = new PgnGame();
+            var move = new PgnMove();
+            _state.OnEnter(move);
 
-        }
+            _state.Parse('1', '2', game);
+            _state.Parse('2', '0', game);
 
-        public PgnMove(string move, string comment, PgnVariation variation, string annotation)
-        {
-            Move = move;
-            Comment = comment;
-            Variation = new List<PgnVariation>() {variation};
-            Annotation = annotation;
+            _state.OnExit();
+
+            Assert.AreEqual("$12", move.Annotation);
         }
     }
 }

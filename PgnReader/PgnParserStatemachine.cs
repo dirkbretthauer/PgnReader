@@ -33,11 +33,10 @@ namespace CChessCore.Pgn
     public class PgnParserStatemachine
     {
         #region fields
-        private readonly PgnReader _reader;
         private PgnParserState _currentState;
         private PgnParserState _previousState;
         private static PgnParserState _initState;
-        private static PgnParserState _restOfLineCommentState;
+        private static TextCommentState _restOfLineCommentState;
         private static TextCommentState _textCommentState;
         private static PgnParserState _tagSectionState;
         private static MovesSectionState _movesSectionState;
@@ -45,15 +44,9 @@ namespace CChessCore.Pgn
         private static PgnParserState _annotationState;
         #endregion
 
-
-        #region properties
-        public static IEnumerable<string> Results = new string[] { "1-0", "0-1", "1/2-1/2", "*" };        
-        #endregion
-
-        public PgnParserStatemachine(PgnReader reader)
+        public PgnParserStatemachine()
         {
-            _reader = reader;
-            _restOfLineCommentState = new RestOfLineCommentState(this);
+            _restOfLineCommentState = new TextCommentState(this);
             _textCommentState = new TextCommentState(this);
             _tagSectionState = new TagSectionState(this);
             _movesSectionState = new MovesSectionState(this);
@@ -69,6 +62,9 @@ namespace CChessCore.Pgn
             _annotationState.AddTransition(GetPreviousState, c => c == ' ');
 
             _recursiveVariationState.AddTransition(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token && !_recursiveVariationState.VariationContainsOpeningBrace);
+            _recursiveVariationState.AddTransition(() => _annotationState, c => c == PgnToken.NumericAnnotationGlyph.Token);
+            _recursiveVariationState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
+            _recursiveVariationState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
 
             _restOfLineCommentState.AddTransition(GetPreviousState, c => c == '\n');
 
@@ -107,11 +103,6 @@ namespace CChessCore.Pgn
             }
 
             return result;
-        }
-
-        internal void SkipNextChars(int count)
-        {
-            _reader.SkipNextChars(count);
         }
     }
 }

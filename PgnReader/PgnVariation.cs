@@ -23,40 +23,40 @@
 ///////////////////////////////////////////////////////////////////////////////
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
+
 namespace CChessCore.Pgn
 {
-    internal class RestOfLineCommentState : PgnParserState
+    public class PgnVariation
     {
-        public RestOfLineCommentState(PgnParserStatemachine reader)
-            : base(reader)
+        private List<PgnMove> _variation;
+
+        public PgnVariation()
         {
+            _variation = new List<PgnMove>();
         }
 
-        public override void OnExit()
+        public void Add(PgnMove move)
         {
-            _currentMove.Comment = GetStateBuffer().Trim();
+            _variation.Add(move);
         }
 
-        protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
-        {
-            if(char.IsWhiteSpace(current) && char.IsWhiteSpace(next))
-            {
-                //remove double whitespaces
-            }
-            else if(char.IsWhiteSpace(current))
-            {
-                _stateBuffer.Add(' ');
-            }
-            else if(current == '\r')
-            {
-                //remove linebreaks
-            }
-            else
-            {
-                _stateBuffer.Add(current);
-            }
+        public int Count { get { return _variation.Count; } }
 
-            return PgnParseResult.None;
+        public PgnMove this[int index]
+        {
+            get { return _variation[index]; }
+            set
+            {
+                _variation[index] = value;
+            }
+        }
+
+        public override string ToString()
+        {
+            //TODO
+            return base.ToString();
         }
     }
 }

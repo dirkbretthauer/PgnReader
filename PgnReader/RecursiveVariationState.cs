@@ -23,20 +23,32 @@
 ///////////////////////////////////////////////////////////////////////////////
 #endregion
 
+using System.Collections.Generic;
 namespace CChessCore.Pgn
 {
     internal class RecursiveVariationState : PgnParserState
     {
         public bool VariationContainsOpeningBrace { get; private set; }
 
+        protected List<char> _singleMoveBuffer;
+        private PgnVariation _currentVariation;
+        private PgnMove _currentMoveInVariation;
+
         public RecursiveVariationState(PgnParserStatemachine reader)
             : base(reader)
         {
+            _singleMoveBuffer = new List<char>(255);
+        }
+
+        public override void OnEnter(PgnMove currentMove)
+        {
+            _currentMoveInVariation = new PgnMove();
+            _currentMove = currentMove;
+            _currentVariation = new PgnVariation();
         }
 
         public override void OnExit()
         {
-            _currentMove.Comment = GetStateBuffer().Trim();
         }
 
         protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
@@ -48,10 +60,37 @@ namespace CChessCore.Pgn
             else if(char.IsWhiteSpace(current))
             {
                 _stateBuffer.Add(' ');
+                var temp = new string(_singleMoveBuffer.ToArray());
+                if(!string.IsNullOrWhiteSpace(temp))
+                {
+                    _currentMoveInVariation.Move = temp.Trim();
+                    _currentVariation.Add(_currentMoveInVariation);
+                    _currentMoveInVariation = new PgnMove();
+                }
             }
             else if(current == '\r')
             {
                 //remove linebreaks
+            }
+
+            else if(char.IsLetterOrDigit(current))
+            {
+                if(!string.IsNullOrWhiteSpace(_currentMoveInVariation.Move))
+                {
+                    _currentVariation.Add(_currentMoveInVariation);
+                    _singleMoveBuffer.Clear();
+
+                    _currentMoveInVariation = new PgnMove();
+
+                }
+
+                _stateBuffer.Add(current);
+                _singleMoveBuffer.Add(current);
+            }
+            else if(current == PgnToken.Period.Token && next != PgnToken.Period.Token)
+            {
+                _singleMoveBuffer.Clear();
+                _stateBuffer.Add(current);
             }
             else if(current == PgnToken.RecursiveVariationBegin.Token)
             {

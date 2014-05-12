@@ -40,7 +40,7 @@ namespace CChessCore.Pgn
 
         public IList<PgnMove> Moves { get { return _moves; } }
 
-        public string Termination { get; set; }
+        public string Result { get; set; }
 
         private readonly IList<PgnTag> _tagList;
         private IList<PgnMove> _moves;
@@ -107,13 +107,13 @@ namespace CChessCore.Pgn
                 if(!string.IsNullOrWhiteSpace(move.Comment))
                     sb.Append(PgnToken.TextCommentBegin.Token).Append(move.Comment).Append(PgnToken.TextCommentEnd.Token).Append(' ');
 
-                if(!string.IsNullOrWhiteSpace(move.Variation))
+                if(move.Variation.Count > 0)
                     sb.Append(PgnToken.RecursiveVariationBegin.Token).Append(move.Variation).Append(PgnToken.RecursiveVariationEnd.Token).Append(' ');
 
                 halfmoveCounter++;
             }
 
-            sb.Append(Termination);
+            sb.Append(Result);
 
             return sb.ToString();
         }
