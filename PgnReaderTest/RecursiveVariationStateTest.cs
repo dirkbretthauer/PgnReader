@@ -64,7 +64,7 @@ namespace PgnReaderTest
 
             _state.OnExit();
 
-            Assert.AreEqual("e4", move.Variation[0][0]);
+            Assert.AreEqual("e4", move.Variation[0][0].Move);
         }
 
         [TestMethod]
@@ -82,8 +82,8 @@ namespace PgnReaderTest
 
             _state.OnExit();
 
-            Assert.AreEqual("e4", move.Move);
-            Assert.IsTrue(move.IsValid);
+            Assert.AreEqual("e4", move.Variation[0][0].Move);
+            Assert.IsTrue(move.Variation[0][0].IsValid);
         }
 
         [TestMethod]
@@ -101,12 +101,11 @@ namespace PgnReaderTest
             _state.Parse('e', '5', game);
             _state.Parse('5', ' ', game);
             _state.Parse(' ', '2', game);
-            _state.Parse('2', '.', game);
 
             _state.OnExit();
 
-            Assert.AreEqual(2, game.Moves.Count);
-            Assert.AreEqual("e5", game.Moves[1].Move);
+            Assert.AreEqual(2, move.Variation[0].Count);
+            Assert.AreEqual("e5", move.Variation[0][1].Move);
         }
     }
 }

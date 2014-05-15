@@ -59,18 +59,18 @@ namespace CChessCore.Pgn
             _initState.AddTransition(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
             _initState.AddTransition(() => _movesSectionState, c => char.IsDigit(c), game => _movesSectionState.InitGame(game));
 
-            _annotationState.AddTransition(GetPreviousState, c => c == ' ');
+            _annotationState.AddExit(GetPreviousState, c => c == ' ');
 
-            _recursiveVariationState.AddTransition(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token && !_recursiveVariationState.VariationContainsOpeningBrace);
+            _recursiveVariationState.AddExit(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token && !_recursiveVariationState.VariationContainsOpeningBrace);
             _recursiveVariationState.AddTransition(() => _annotationState, c => c == PgnToken.NumericAnnotationGlyph.Token);
             _recursiveVariationState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _recursiveVariationState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
 
-            _restOfLineCommentState.AddTransition(GetPreviousState, c => c == '\n');
+            _restOfLineCommentState.AddExit(GetPreviousState, c => c == '\n');
 
-            _textCommentState.AddTransition(GetPreviousState, c => c == PgnToken.TextCommentEnd.Token && !_textCommentState.CommentContainsOpeningBrace);
+            _textCommentState.AddExit(GetPreviousState, c => c == PgnToken.TextCommentEnd.Token && !_textCommentState.CommentContainsOpeningBrace);
 
-            _tagSectionState.AddTransition(() => _initState, c => c == PgnToken.TagEnd.Token);
+            _tagSectionState.AddExit(() => _initState, c => c == PgnToken.TagEnd.Token);
             _tagSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _tagSectionState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
 
@@ -78,7 +78,7 @@ namespace CChessCore.Pgn
             _movesSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _movesSectionState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
             _movesSectionState.AddTransition(() => _recursiveVariationState, c => c == PgnToken.RecursiveVariationBegin.Token);
-            _movesSectionState.AddTransition(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
+            _movesSectionState.AddExit(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
 
             _currentState = _initState;
         }

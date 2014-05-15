@@ -33,6 +33,10 @@ namespace CChessCore.Pgn
         private IList<Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>> _transitions =
             new List<Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>>();
 
+        private IList<Tuple<Func<char, bool>, Func<PgnParserState>>> _exits =
+            new List<Tuple<Func<char, bool>, Func<PgnParserState>>>();
+
+
         protected readonly PgnParserStatemachine _statemachine;
         
         protected List<char> _stateBuffer;
@@ -49,6 +53,11 @@ namespace CChessCore.Pgn
         public virtual PgnParseResult Parse(char current, char next, PgnGame currentGame)
         {
             if(TryTransite(current, currentGame))
+            {
+                return PgnParseResult.None;
+            }
+
+            if(TryExit(current, currentGame))
             {
                 return PgnParseResult.None;
             }
@@ -74,6 +83,11 @@ namespace CChessCore.Pgn
             _transitions.Add(new Tuple<Func<char, bool>, Func<PgnParserState>, Action<PgnGame>>(condition, next, action));
         }
 
+        public void AddExit(Func<PgnParserState> next, Func<char, bool> condition)
+        {
+            _exits.Add(new Tuple<Func<char, bool>, Func<PgnParserState>>(condition, next));
+        }
+
         protected bool TryTransite(char current, PgnGame game)
         {
             foreach(var item in _transitions)
@@ -92,11 +106,24 @@ namespace CChessCore.Pgn
             return false;
         }
 
+        protected bool TryExit(char current, PgnGame game)
+        {
+            foreach(var item in _exits)
+            {
+                if(item.Item1(current))
+                {
+                    OnExit();
+                    _statemachine.SetState(item.Item2());
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public void ChangeState(PgnParserState newState, PgnMove currentMove = null)
         {
-            OnExit();
-            _statemachine.SetState(newState);
-            
+            _statemachine.SetState(newState);   
             newState.OnEnter(currentMove);
         }
 

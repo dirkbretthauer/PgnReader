@@ -30,25 +30,24 @@ namespace CChessCore.Pgn
     {
         public bool VariationContainsOpeningBrace { get; private set; }
 
-        protected List<char> _singleMoveBuffer;
         private PgnVariation _currentVariation;
-        private PgnMove _currentMoveInVariation;
 
         public RecursiveVariationState(PgnParserStatemachine reader)
             : base(reader)
         {
-            _singleMoveBuffer = new List<char>(255);
         }
 
         public override void OnEnter(PgnMove currentMove)
         {
-            _currentMoveInVariation = new PgnMove();
-            _currentMove = currentMove;
             _currentVariation = new PgnVariation();
+            currentMove.Variation.Add(_currentVariation);
+
+            _currentMove = new PgnMove();
         }
 
         public override void OnExit()
         {
+            CheckToFinishMove();
         }
 
         protected override PgnParseResult DoParse(char current, char next, PgnGame currentGame)
@@ -59,38 +58,44 @@ namespace CChessCore.Pgn
             }
             else if(char.IsWhiteSpace(current))
             {
-                _stateBuffer.Add(' ');
-                var temp = new string(_singleMoveBuffer.ToArray());
-                if(!string.IsNullOrWhiteSpace(temp))
+                CheckToFinishMove();
+
+                if(next == PgnToken.RecursiveVariationEnd.Token)
                 {
-                    _currentMoveInVariation.Move = temp.Trim();
-                    _currentVariation.Add(_currentMoveInVariation);
-                    _currentMoveInVariation = new PgnMove();
+                    if(!string.IsNullOrWhiteSpace(_currentMove.Move))
+                    {
+                        _currentVariation.Add(_currentMove);
+                        _stateBuffer.Clear();
+
+                        _currentMove = new PgnMove();
+                    }
                 }
             }
             else if(current == '\r')
             {
                 //remove linebreaks
             }
-
+            else if(current == '-' ||
+                current == '+' ||
+                current == '#')
+            {
+                _stateBuffer.Add(current);
+            }
             else if(char.IsLetterOrDigit(current))
             {
-                if(!string.IsNullOrWhiteSpace(_currentMoveInVariation.Move))
+                if(!string.IsNullOrWhiteSpace(_currentMove.Move))
                 {
-                    _currentVariation.Add(_currentMoveInVariation);
-                    _singleMoveBuffer.Clear();
+                    _currentVariation.Add(_currentMove);
+                    _stateBuffer.Clear();
 
-                    _currentMoveInVariation = new PgnMove();
-
+                    _currentMove = new PgnMove();
                 }
 
                 _stateBuffer.Add(current);
-                _singleMoveBuffer.Add(current);
             }
-            else if(current == PgnToken.Period.Token && next != PgnToken.Period.Token)
+            else if(current == PgnToken.Period.Token)
             {
-                _singleMoveBuffer.Clear();
-                _stateBuffer.Add(current);
+                _stateBuffer.Clear();
             }
             else if(current == PgnToken.RecursiveVariationBegin.Token)
             {
@@ -104,10 +109,22 @@ namespace CChessCore.Pgn
             }
             else
             {
-                _stateBuffer.Add(current);
+                throw new PgnReaderException("RecursiveVariationState: no idea how to handle: " + current);
             }
 
             return PgnParseResult.None;
+        }
+
+        private void CheckToFinishMove()
+        {
+            if(_stateBuffer.Count > 0)
+            {
+                _currentMove.Move = new string(_stateBuffer.ToArray());
+                _currentVariation.Add(_currentMove);
+                _stateBuffer.Clear();
+
+                _currentMove = new PgnMove();
+            }
         }
     }
 }

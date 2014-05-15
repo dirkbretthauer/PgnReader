@@ -53,13 +53,13 @@ namespace CChessCore.Pgn
         }
 
         public PgnMove(string move, string comment) :
-            this(string.Empty, string.Empty, string.Empty)
+            this(string.Empty, string.Empty, null)
         {
 
         }
 
-        public PgnMove(string move, string comment, string variation) :
-            this(string.Empty, string.Empty, new PgnVariation(), string.Empty)
+        public PgnMove(string move, string comment, PgnVariation variation) :
+            this(string.Empty, string.Empty, variation, string.Empty)
         {
 
         }
@@ -68,7 +68,11 @@ namespace CChessCore.Pgn
         {
             Move = move;
             Comment = comment;
-            Variation = new List<PgnVariation>() {variation};
+            Variation = new List<PgnVariation>();
+            if(variation != null)
+            {
+                Variation.Add(variation);
+            }
             Annotation = annotation;
         }
     }
