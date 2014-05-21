@@ -27,8 +27,6 @@ namespace CChessCore.Pgn
 {
     internal class TextCommentState : PgnParserState
     {
-        public bool CommentContainsOpeningBrace { get; private set; }
-
         public TextCommentState(PgnParserStatemachine reader)
             : base(reader)
         {
@@ -52,16 +50,6 @@ namespace CChessCore.Pgn
             else if(current == '\r')
             {
                 //remove linebreaks
-            }
-            else if(current == PgnToken.TextCommentBegin.Token)
-            {
-                CommentContainsOpeningBrace = true;
-                _stateBuffer.Add(current);
-            }
-            else if(current == PgnToken.TextCommentEnd.Token)
-            {
-                CommentContainsOpeningBrace = false;
-                _stateBuffer.Add(current);
             }
             else
             {

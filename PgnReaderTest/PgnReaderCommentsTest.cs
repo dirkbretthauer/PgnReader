@@ -33,6 +33,27 @@ namespace PgnReaderTest
     [TestClass]
     public class PgnReaderCommentsTest
     {
+        private const string GameWithNestedVariant = @"
+            [Event ""5th Classic GpA 2013""]
+            [Site ""London ENG""]
+            [Date ""2013.12.11""]
+            [Round ""1""]
+            [White ""McShane, L.""]
+            [Black ""Anand, V.""]
+            [Result ""0-1""]
+            [ECO ""B11""]
+            [WhiteElo ""2684""]
+            [BlackElo ""2773""]
+            [PlyCount ""92""]
+            [EventDate ""2013.12.11""]
+
+            1. e4 c6 2. Nf3 d5 3. Nc3 Bg4 (... Bh5) 4. h3 Bxf3 5. Qxf3 e6 6. Be2 Nf6 7. O-O Bb4 8. e5
+            Nfd7 9. Qg4 Bf8 10. d4 c5 11. Bg5 Qb6 12. dxc5 Qxc5 13. Be3 h5 14. Qg3 d4 15.
+            Ne4 h4 16. Qf3 Qd5 17. c4 Qxe5 18. Bf4 Qf5 19. Bd3 Qh5 20. Nf6+ gxf6 21. Qxb7
+            Ne5 22. Qxa8 Bd6 23. c5 Nf3+ 24. Qxf3 Qxf3 25. gxf3 (25. gxf3 Bd3 26. b4 (26. b3 b6)) Bxf4 26. b4 Nc6 27. Bb5 Kd7
+            28. Rfd1 e5 29. a3 f5 30. Kf1 Kc7 31. Ke2 e4 32. fxe4 fxe4 33. Bxc6 d3+ 34. Kf1
+            Kxc6 35. Kg2 Kd5 36. Rg1 Be5 37. Rad1 Rg8+ 38. Kf1 Rxg1+ 39. Kxg1 f5 40. Kg2;This is an eol comment
+            Kd4 41. c6 f4 42. b5 Bc7 43. Rb1 d2 44. Kf1 Kd3 45. a4 e3 46. fxe3 fxe3 0-1";
 
         private const string GameWithComments = @"[Event ""5th Classic GpA 2013""]
             [Site ""London ENG""]
@@ -72,6 +93,27 @@ namespace PgnReaderTest
             Nfd7 9. Qg4 Bf8 10. d4 c5 11. Bg5 Qb6 12. dxc5 Qxc5 13. Be3 h5 14. Qg3 d4 15.
             Ne4 h4 16. Qf3 Qd5 17. c4 Qxe5 18. Bf4 Qf5 19. Bd3 Qh5 20. Nf6+ gxf6 21. Qxb7
             Ne5 22. Qxa8 Bd6 23. c5 Nf3+ 24. Qxf3 Qxf3 25. gxf3 (25. gxf3 Bd3 26. b4) Bxf4 26. b4 Nc6 27. Bb5 Kd7
+            28. Rfd1 e5 29. a3 f5 30. Kf1 Kc7 31. Ke2 e4 32. fxe4 fxe4 33. Bxc6 d3+ 34. Kf1
+            Kxc6 35. Kg2 Kd5 36. Rg1 Be5 37. Rad1 Rg8+ 38. Kf1 Rxg1+ 39. Kxg1 f5 40. Kg2;This is an eol comment
+            Kd4 41. c6 f4 42. b5 Bc7 43. Rb1 d2 44. Kf1 Kd3 45. a4 e3 46. fxe3 fxe3 0-1
+
+            [Event ""5th Classic GpA 2013""]
+            [Site ""London ENG""]
+            [Date ""2013.12.11""]
+            [Round ""1""]
+            [White ""McShane, L.""]
+            [Black ""Anand, V.""]
+            [Result ""0-1""]
+            [ECO ""B11""]
+            [WhiteElo ""2684""]
+            [BlackElo ""2773""]
+            [PlyCount ""92""]
+            [EventDate ""2013.12.11""]
+
+            1. e4 c6 2. Nf3 d5 3. Nc3 Bg4 (... Bh5) 4. h3 Bxf3 5. Qxf3 e6 6. Be2 Nf6 7. O-O Bb4 8. e5
+            Nfd7 9. Qg4 Bf8 10. d4 c5 11. Bg5 Qb6 12. dxc5 Qxc5 13. Be3 h5 14. Qg3 d4 15.
+            Ne4 h4 16. Qf3 Qd5 17. c4 Qxe5 18. Bf4 Qf5 19. Bd3 Qh5 20. Nf6+ gxf6 21. Qxb7
+            Ne5 22. Qxa8 Bd6 23. c5 Nf3+ 24. Qxf3 Qxf3 25. gxf3 (25. gxf3 Bd3 26. b4 (26. b3 b6)) Bxf4 26. b4 Nc6 27. Bb5 Kd7
             28. Rfd1 e5 29. a3 f5 30. Kf1 Kc7 31. Ke2 e4 32. fxe4 fxe4 33. Bxc6 d3+ 34. Kf1
             Kxc6 35. Kg2 Kd5 36. Rg1 Be5 37. Rad1 Rg8+ 38. Kf1 Rxg1+ 39. Kxg1 f5 40. Kg2;This is an eol comment
             Kd4 41. c6 f4 42. b5 Bc7 43. Rb1 d2 44. Kf1 Kd3 45. a4 e3 46. fxe3 fxe3 0-1
@@ -184,25 +226,6 @@ namespace PgnReaderTest
         }
 
         [TestMethod]
-        public void ReadVariationTest()
-        {
-            _pgnReader.ReadGame();
-            _pgnReader.ReadGame();
-
-            Assert.AreEqual(0, _pgnReader.CurrentGame.Moves[2].Variation.Count);
-
-            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[5].Variation.Count);
-            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[5].Variation[0].Count);
-            Assert.AreEqual("Bh5", _pgnReader.CurrentGame.Moves[5].Variation[0][0].Move);
-
-            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[48].Variation.Count);
-            Assert.AreEqual(3, _pgnReader.CurrentGame.Moves[48].Variation[0].Count);
-            Assert.AreEqual("gxf3", _pgnReader.CurrentGame.Moves[48].Variation[0][0].Move);
-            Assert.AreEqual("Bd3", _pgnReader.CurrentGame.Moves[48].Variation[0][1].Move);
-            Assert.AreEqual("b4", _pgnReader.CurrentGame.Moves[48].Variation[0][2].Move);
-        }
-
-        [TestMethod]
         public void MovesSectionTest()
         {
             _pgnReader.ReadGame();
@@ -225,16 +248,63 @@ namespace PgnReaderTest
         }
 
         [TestMethod]
-        public void ReadAnnotationsTest()
+        public void ReadVariationTest()
+        {
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+
+            Assert.AreEqual(0, _pgnReader.CurrentGame.Moves[2].Variation.Count);
+
+            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[5].Variation.Count);
+            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[5].Variation[0].Count);
+            Assert.AreEqual("Bh5", _pgnReader.CurrentGame.Moves[5].Variation[0][0].Move);
+
+            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[48].Variation.Count);
+            Assert.AreEqual(3, _pgnReader.CurrentGame.Moves[48].Variation[0].Count);
+            Assert.AreEqual("gxf3", _pgnReader.CurrentGame.Moves[48].Variation[0][0].Move);
+            Assert.AreEqual("Bd3", _pgnReader.CurrentGame.Moves[48].Variation[0][1].Move);
+            Assert.AreEqual("b4", _pgnReader.CurrentGame.Moves[48].Variation[0][2].Move);
+        }
+
+        [TestMethod]
+        public void ReadNestedVariationTest()
         {
             _pgnReader.ReadGame();
             _pgnReader.ReadGame();
             _pgnReader.ReadGame();
 
-            Assert.AreEqual(@"3...Bb4 { The Winawer Variation is probably best, though not as easy to play. }", _pgnReader.CurrentGame.Moves[5].Comment);
-            Assert.AreEqual(@"24...Rc7 { Mark and Fritz7 agree! }", _pgnReader.CurrentGame.Moves[47].Comment);
+            Assert.AreEqual(0, _pgnReader.CurrentGame.Moves[2].Variation.Count);
+
+            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[5].Variation.Count);
+            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[5].Variation[0].Count);
+            Assert.AreEqual("Bh5", _pgnReader.CurrentGame.Moves[5].Variation[0][0].Move);
+
+            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[48].Variation.Count);
+            Assert.AreEqual(3, _pgnReader.CurrentGame.Moves[48].Variation[0].Count);
+            Assert.AreEqual("gxf3", _pgnReader.CurrentGame.Moves[48].Variation[0][0].Move);
+            Assert.AreEqual("Bd3", _pgnReader.CurrentGame.Moves[48].Variation[0][1].Move);
+            Assert.AreEqual(0, _pgnReader.CurrentGame.Moves[48].Variation[0][1].Variation.Count);
+            Assert.AreEqual("b4", _pgnReader.CurrentGame.Moves[48].Variation[0][2].Move);
+            Assert.AreEqual(2, _pgnReader.CurrentGame.Moves[48].Variation[0][2].Variation[0].Count);
+            Assert.AreEqual("b3", _pgnReader.CurrentGame.Moves[48].Variation[0][2].Variation[0][0].Move);
+            Assert.AreEqual("b6", _pgnReader.CurrentGame.Moves[48].Variation[0][2].Variation[0][1].Move);
+        }
+
+        [TestMethod]
+        public void ReadAnnotationsTest()
+        {
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+            _pgnReader.ReadGame();
+
+            Assert.AreEqual(1, _pgnReader.CurrentGame.Moves[5].Variation[0].Count);
+            Assert.AreEqual("Bb4", _pgnReader.CurrentGame.Moves[5].Variation[0][0].Move);
+            Assert.AreEqual("The Winawer Variation is probably best, though not as easy to play.", _pgnReader.CurrentGame.Moves[5].Variation[0][0].Comment);
+            Assert.AreEqual("Rc7", _pgnReader.CurrentGame.Moves[47].Variation[0][0].Move);
+            Assert.AreEqual("Mark and Fritz7 agree!", _pgnReader.CurrentGame.Moves[47].Variation[0][0].Comment);
             Assert.AreEqual(@"2", _pgnReader.CurrentGame.Moves[47].Annotation);
-            Assert.AreEqual("Black created the weakness (Pa5) and can't quite defend it, so Anand forces a draw.", _pgnReader.CurrentGame.Moves[54].Comment);
+            Assert.AreEqual("Blackreated the weakness (Pa5) and can't quite defend it, so Anand forces a draw.", _pgnReader.CurrentGame.Moves[54].Comment);
         }
     }
 }

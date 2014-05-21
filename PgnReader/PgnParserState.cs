@@ -42,10 +42,18 @@ namespace CChessCore.Pgn
         protected List<char> _stateBuffer;
         protected PgnMove _currentMove;
 
+        protected static Stack<PgnParserState> _history;
+
         protected PgnParserState(PgnParserStatemachine statemachine, int stateBufferSize = 255)
         {
             _statemachine = statemachine;
             _stateBuffer = new List<char>(stateBufferSize);
+            _history = new Stack<PgnParserState>();
+        }
+
+        public void Init()
+        {
+            _history.Push(this);
         }
 
         protected abstract PgnParseResult DoParse(char current, char next, PgnGame currentGame);
@@ -65,7 +73,10 @@ namespace CChessCore.Pgn
             return DoParse(current, next, currentGame);
         }
             
-        public virtual void OnExit() { }
+        public virtual void OnExit()
+        {
+
+        }
 
         public virtual void OnEnter(PgnMove currentMove)
         {
@@ -95,6 +106,7 @@ namespace CChessCore.Pgn
                 if(item.Item1(current))
                 {
                     ChangeState(item.Item2(), _currentMove);
+                    _history.Push(item.Item2());
                     if(item.Item3 != null)
                     {
                         item.Item3(game);
@@ -113,6 +125,7 @@ namespace CChessCore.Pgn
                 if(item.Item1(current))
                 {
                     OnExit();
+                    _history.Pop();
                     _statemachine.SetState(item.Item2());
                     return true;
                 }
@@ -125,6 +138,11 @@ namespace CChessCore.Pgn
         {
             _statemachine.SetState(newState);   
             newState.OnEnter(currentMove);
+        }
+
+        public PgnParserState GetPreviousState()
+        {
+            return _history.Peek();
         }
 
         internal string GetStateBuffer()

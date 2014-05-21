@@ -28,8 +28,6 @@ namespace CChessCore.Pgn
 {
     internal class RecursiveVariationState : PgnParserState
     {
-        public bool VariationContainsOpeningBrace { get; private set; }
-
         private PgnVariation _currentVariation;
 
         public RecursiveVariationState(PgnParserStatemachine reader)
@@ -59,17 +57,6 @@ namespace CChessCore.Pgn
             else if(char.IsWhiteSpace(current))
             {
                 CheckToFinishMove();
-
-                if(next == PgnToken.RecursiveVariationEnd.Token)
-                {
-                    if(!string.IsNullOrWhiteSpace(_currentMove.Move))
-                    {
-                        _currentVariation.Add(_currentMove);
-                        _stateBuffer.Clear();
-
-                        _currentMove = new PgnMove();
-                    }
-                }
             }
             else if(current == '\r')
             {
@@ -85,7 +72,6 @@ namespace CChessCore.Pgn
             {
                 if(!string.IsNullOrWhiteSpace(_currentMove.Move))
                 {
-                    _currentVariation.Add(_currentMove);
                     _stateBuffer.Clear();
 
                     _currentMove = new PgnMove();
@@ -97,19 +83,10 @@ namespace CChessCore.Pgn
             {
                 _stateBuffer.Clear();
             }
-            else if(current == PgnToken.RecursiveVariationBegin.Token)
-            {
-                VariationContainsOpeningBrace = true;
-                _stateBuffer.Add(current);
-            }
-            else if(current == PgnToken.RecursiveVariationEnd.Token)
-            {
-                VariationContainsOpeningBrace = false;
-                _stateBuffer.Add(current);
-            }
             else
             {
-                throw new PgnReaderException("RecursiveVariationState: no idea how to handle: " + current);
+                _stateBuffer.Add(current);
+                //throw new PgnReaderException("RecursiveVariationState: no idea how to handle: " + current);
             }
 
             return PgnParseResult.None;
@@ -122,8 +99,6 @@ namespace CChessCore.Pgn
                 _currentMove.Move = new string(_stateBuffer.ToArray());
                 _currentVariation.Add(_currentMove);
                 _stateBuffer.Clear();
-
-                _currentMove = new PgnMove();
             }
         }
     }

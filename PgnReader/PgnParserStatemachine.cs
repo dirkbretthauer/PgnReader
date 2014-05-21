@@ -34,7 +34,6 @@ namespace CChessCore.Pgn
     {
         #region fields
         private PgnParserState _currentState;
-        private PgnParserState _previousState;
         private static PgnParserState _initState;
         private static TextCommentState _restOfLineCommentState;
         private static TextCommentState _textCommentState;
@@ -61,14 +60,16 @@ namespace CChessCore.Pgn
 
             _annotationState.AddExit(GetPreviousState, c => c == ' ');
 
-            _recursiveVariationState.AddExit(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token && !_recursiveVariationState.VariationContainsOpeningBrace);
+            _recursiveVariationState.AddExit(GetPreviousState, c => c == PgnToken.RecursiveVariationEnd.Token);
             _recursiveVariationState.AddTransition(() => _annotationState, c => c == PgnToken.NumericAnnotationGlyph.Token);
             _recursiveVariationState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
             _recursiveVariationState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
+            _recursiveVariationState.AddTransition(() => _recursiveVariationState, c => c == PgnToken.RecursiveVariationBegin.Token);
 
             _restOfLineCommentState.AddExit(GetPreviousState, c => c == '\n');
 
-            _textCommentState.AddExit(GetPreviousState, c => c == PgnToken.TextCommentEnd.Token && !_textCommentState.CommentContainsOpeningBrace);
+            _textCommentState.AddExit(GetPreviousState, c => c == PgnToken.TextCommentEnd.Token);
+            _textCommentState.AddTransition(() => _textCommentState, c => c == PgnToken.TextCommentBegin.Token);
 
             _tagSectionState.AddExit(() => _initState, c => c == PgnToken.TagEnd.Token);
             _tagSectionState.AddTransition(() => _restOfLineCommentState, c => c == PgnToken.RestOfLineComment.Token);
@@ -81,16 +82,16 @@ namespace CChessCore.Pgn
             _movesSectionState.AddExit(() => _tagSectionState, c => c == PgnToken.TagBegin.Token);
 
             _currentState = _initState;
+            _currentState.Init();
         }
 
         private PgnParserState GetPreviousState()
         {
-            return _previousState;
+            return _currentState.GetPreviousState();
         }
 
         internal void SetState(PgnParserState newState)
         {
-            _previousState = _currentState;
             _currentState = newState;
         }
 

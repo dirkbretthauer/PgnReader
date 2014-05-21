@@ -89,7 +89,7 @@ namespace CChessCore.Pgn
 
                 _stateBuffer.Add(current);
             }
-            else if(current == PgnToken.Period.Token && next != PgnToken.Period.Token)
+            else if(current == PgnToken.Period.Token)
             {
                 _stateBuffer.Clear();
             }
@@ -152,7 +152,8 @@ namespace CChessCore.Pgn
             }
             else
             {
-                throw new PgnReaderException("MovesSectionState: no idea how to handle: " + current);
+                _stateBuffer.Add(current);
+                //throw new PgnReaderException("MovesSectionState: no idea how to handle: " + current);
             }
 
             return PgnParseResult.None;
