@@ -63,6 +63,13 @@ namespace CChessCore.Pgn
         {
             _stateBuffer.Add(current);
                 
+            if(next == PgnToken.RecursiveVariationEnd.Token)
+            {
+                OnExit();
+                var latest = _history.Pop();
+                _statemachine.SetState(latest);
+            }
+            
             return PgnParseResult.None;
         }
     }
